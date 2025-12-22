@@ -15,6 +15,8 @@ import Events from "./pages/Events";
 import Messages from "./pages/Messages";
 import Mentorship from "./pages/Mentorship";
 import Feed from "./pages/Feed";
+import AdminPortal from "./pages/AdminPortal";
+import BatchReunion from "./pages/BatchReunion";
 import Navigation from "./components/Navigation";
 
 function Router() {
@@ -22,6 +24,8 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/auth"} component={Auth} />
+      <Route path={"/verify-email"} component={Auth} />
+      <Route path={"/reset-password"} component={Auth} />
       <Route path={"/profile-setup"} component={ProfileSetup} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/directory"} component={Directory} />
@@ -30,6 +34,8 @@ function Router() {
       <Route path={"/messages"} component={Messages} />
       <Route path={"/mentorship"} component={Mentorship} />
       <Route path={"/feed"} component={Feed} />
+      <Route path={"/admin"} component={AdminPortal} />
+      <Route path={"/batch-reunion"} component={BatchReunion} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
