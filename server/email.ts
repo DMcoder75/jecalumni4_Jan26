@@ -379,3 +379,93 @@ export function getPasswordResetRequestTemplate(
     </html>
   `
 }
+
+/**
+ * User approval email template
+ */
+export function getApprovalTemplate(
+  name: string,
+  email: string,
+  password: string
+): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #8B3A3A; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+          .content { background-color: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
+          .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; }
+          .credentials { background-color: #fff; padding: 15px; border: 1px dashed #8B3A3A; margin: 20px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Welcome to JEC MCA Alumni Network</h1>
+          </div>
+          <div class="content">
+            <p>Hello ${name},</p>
+            <p>Your request to join the JEC MCA Alumni Network has been approved!</p>
+            <p>You can now log in to the platform using the following credentials:</p>
+            <div class="credentials">
+              <p><strong>Email:</strong> ${email}</p>
+              <p><strong>Password:</strong> ${password}</p>
+            </div>
+            <p>Please change your password after your first login for security.</p>
+            <p><a href="https://jecmcaalumni.web.app/auth">Click here to Login</a></p>
+          </div>
+          <div class="footer">
+            <p>&copy; 2024 JEC MCA Alumni Network. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+}
+
+/**
+ * Password reset email template
+ */
+export function getPasswordResetTemplate(
+  name: string,
+  password: string
+): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #8B3A3A; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+          .content { background-color: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
+          .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; }
+          .credentials { background-color: #fff; padding: 15px; border: 1px dashed #8B3A3A; margin: 20px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Password Reset - JEC MCA Alumni Network</h1>
+          </div>
+          <div class="content">
+            <p>Hello ${name},</p>
+            <p>Your password has been reset by the administrator.</p>
+            <p>Your new temporary password is:</p>
+            <div class="credentials">
+              <p><strong>Password:</strong> ${password}</p>
+            </div>
+            <p>Please log in and change your password immediately.</p>
+            <p><a href="https://jecmcaalumni.web.app/auth">Click here to Login</a></p>
+          </div>
+          <div class="footer">
+            <p>&copy; 2024 JEC MCA Alumni Network. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+}

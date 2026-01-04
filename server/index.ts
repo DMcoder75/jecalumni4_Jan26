@@ -3,6 +3,7 @@ import { createServer } from "http";
 import path from "path";
 import { fileURLToPath } from "url";
 import emailRoutes from "./routes/email.js";
+import adminRoutes from "./routes/admin.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,8 +16,9 @@ async function startServer() {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  // Email routes
+  // API routes
   app.use("/api/email", emailRoutes);
+  app.use("/api/admin", adminRoutes);
 
   // Serve static files from dist/public in production
   const staticPath =

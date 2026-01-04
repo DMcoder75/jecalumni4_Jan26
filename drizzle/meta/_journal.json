@@ -15,6 +15,13 @@
       "when": 1767482377838,
       "tag": "0001_blushing_shooting_star",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1767487965207,
+      "tag": "0002_illegal_shaman",
+      "breakpoints": true
     }
   ]
 }
