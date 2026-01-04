@@ -26,7 +26,7 @@ export default function Directory() {
 
       if (searchQuery) {
         query = query.or(
-          `name.ilike.%${searchQuery}%,company.ilike.%${searchQuery}%,skills.ilike.%${searchQuery}%`
+          `name.ilike.%${searchQuery}%,company.ilike.%${searchQuery}%,skills.ilike.%${searchQuery}%,first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`
         )
       }
 
@@ -41,7 +41,13 @@ export default function Directory() {
       const { data, error } = await query
 
       if (error) throw error
-      setAlumni(data || [])
+      
+      const processedData = (data || []).map(u => ({
+        ...u,
+        name: u.name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email.split('@')[0]
+      }))
+      
+      setAlumni(processedData)
     } catch (error) {
       console.error('Error fetching alumni:', error)
     } finally {
@@ -88,9 +94,7 @@ export default function Directory() {
     setFilterBatch('')
     setFilterCompany('')
     setLoading(true)
-    setTimeout(() => {
-      setLoading(false)
-    }, 100)
+    fetchAlumni()
   }
 
   return (
@@ -192,7 +196,7 @@ export default function Directory() {
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-primary font-bold text-lg">
-                      {alum.name.charAt(0)}
+                      {alum.name?.charAt(0) || '?'}
                     </span>
                   </div>
                   <div className="flex-1">

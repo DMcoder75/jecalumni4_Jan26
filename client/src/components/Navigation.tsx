@@ -1,6 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
-import { Menu, X, User as UserIcon, LogOut, LayoutDashboard, MessageSquare } from 'lucide-react'
+import { Menu, X, User as UserIcon, LogOut, LayoutDashboard, MessageSquare, Shield } from 'lucide-react'
 import { useState } from 'react'
 import { useLocation } from 'wouter'
 import {
@@ -65,7 +65,7 @@ export default function Navigation() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2 hover:bg-secondary">
-                    <span className="text-sm font-medium">Hi {user.firstName || user.name?.split(' ')[0] || 'User'}</span>
+                    <span className="text-sm font-medium">Hi {user.first_name || user.name?.split(' ')[0] || 'User'}</span>
                     <UserIcon className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -84,6 +84,12 @@ export default function Navigation() {
                     <UserIcon className="mr-2 h-4 w-4" />
                     <span>Profile</span>
                   </DropdownMenuItem>
+                  {user.is_admin && (
+                    <DropdownMenuItem onClick={() => setLocation('/admin')}>
+                      <Shield className="mr-2 h-4 w-4" />
+                      <span>Admin Portal</span>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
                     <LogOut className="mr-2 h-4 w-4" />
@@ -141,7 +147,7 @@ export default function Navigation() {
             {user ? (
               <div className="pt-4 border-t border-border space-y-3">
                 <p className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Hi {user.firstName || user.name?.split(' ')[0] || 'User'}
+                  Hi {user.first_name || user.name?.split(' ')[0] || 'User'}
                 </p>
                 <button
                   onClick={() => { setLocation('/dashboard'); setMobileMenuOpen(false); }}
@@ -161,6 +167,14 @@ export default function Navigation() {
                 >
                   Profile
                 </button>
+                {user.is_admin && (
+                  <button
+                    onClick={() => { setLocation('/admin'); setMobileMenuOpen(false); }}
+                    className="block w-full text-left px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary rounded-lg transition-colors"
+                  >
+                    Admin Portal
+                  </button>
+                )}
                 <button
                   onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
                   className="block w-full text-left px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-lg transition-colors"

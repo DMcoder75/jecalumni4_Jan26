@@ -7,8 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, User as UserIcon, Mail, Briefcase, MapPin, Link as LinkIcon, Edit2, Save, X } from 'lucide-react'
+import { Loader2, User as UserIcon, Mail, Briefcase, MapPin, Link as LinkIcon, Edit2, Save, X, LogOut } from 'lucide-react'
 import { useLocation } from 'wouter'
 
 export default function Dashboard() {
@@ -131,9 +130,15 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary py-12 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">My Dashboard</h1>
-          <p className="text-lg text-muted-foreground">Manage your profile and view your activity</p>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-foreground mb-2">My Dashboard</h1>
+            <p className="text-lg text-muted-foreground">Manage your profile and view your activity</p>
+          </div>
+          <Button variant="outline" onClick={handleSignOut} className="text-destructive hover:bg-destructive/10">
+            <LogOut className="w-4 h-4 mr-2" />
+            Sign Out
+          </Button>
         </div>
 
         {/* Stats Grid */}
@@ -318,87 +323,50 @@ export default function Dashboard() {
               </div>
             </div>
           ) : (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Full Name</p>
-                  <p className="text-lg font-semibold text-foreground">{user.name}</p>
+            <div className="space-y-8">
+              <div className="flex items-start gap-6">
+                <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <UserIcon className="w-12 h-12 text-primary" />
                 </div>
-
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                    <Mail className="w-4 h-4" />
-                    Email
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-foreground mb-1">{user.name}</h3>
+                  <p className="text-lg text-primary font-semibold mb-4">
+                    {user.designation || 'Alumni'} {user.company ? `@ ${user.company}` : ''}
                   </p>
-                  <p className="text-lg font-semibold text-foreground">{user.email}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Mail className="w-4 h-4" />
+                      <span>{user.email}</span>
+                    </div>
+                    {user.batch && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Briefcase className="w-4 h-4" />
+                        <span>Batch of {user.batch}</span>
+                      </div>
+                    )}
+                    {user.location && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <MapPin className="w-4 h-4" />
+                        <span>{user.location}</span>
+                      </div>
+                    )}
+                    {user.linkedin_url && (
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <LinkIcon className="w-4 h-4" />
+                        <a href={user.linkedin_url} target="_blank" rel="noopener noreferrer" className="hover:text-primary underline">
+                          LinkedIn Profile
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 </div>
-
-                {user.batch && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Batch Year</p>
-                    <p className="text-lg font-semibold text-foreground">{user.batch}</p>
-                  </div>
-                )}
-
-                {user.company && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                      <Briefcase className="w-4 h-4" />
-                      Company
-                    </p>
-                    <p className="text-lg font-semibold text-foreground">{user.company}</p>
-                  </div>
-                )}
-
-                {user.designation && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Job Title</p>
-                    <p className="text-lg font-semibold text-foreground">
-                      {user.designation}
-                    </p>
-                  </div>
-                )}
-
-                {user.location && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      Location
-                    </p>
-                    <p className="text-lg font-semibold text-foreground">{user.location}</p>
-                  </div>
-                )}
-
-                {user.phone && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Phone</p>
-                    <p className="text-lg font-semibold text-foreground">{user.phone}</p>
-                  </div>
-                )}
-
-                {user.linkedin_url && (
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1 flex items-center gap-2">
-                      <LinkIcon className="w-4 h-4" />
-                      LinkedIn
-                    </p>
-                    <a
-                      href={user.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline"
-                    >
-                      View Profile
-                    </a>
-                  </div>
-                )}
               </div>
 
               {user.skills && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-3">Skills</p>
+                  <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Skills</h4>
                   <div className="flex flex-wrap gap-2">
-                    {user.skills.split(',').map((skill, idx) => (
+                    {user.skills.split(',').map((skill: string, idx: number) => (
                       <Badge key={idx} variant="secondary">
                         {skill.trim()}
                       </Badge>
@@ -409,24 +377,13 @@ export default function Dashboard() {
 
               {user.bio && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-2">Bio</p>
-                  <p className="text-foreground">{user.bio}</p>
+                  <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">About Me</h4>
+                  <p className="text-muted-foreground leading-relaxed">{user.bio}</p>
                 </div>
               )}
             </div>
           )}
         </Card>
-
-        {/* Sign Out Button */}
-        <div className="mt-8 flex justify-end">
-          <Button
-            onClick={handleSignOut}
-            variant="outline"
-            className="text-destructive hover:bg-destructive/10"
-          >
-            Sign Out
-          </Button>
-        </div>
       </div>
     </div>
   )

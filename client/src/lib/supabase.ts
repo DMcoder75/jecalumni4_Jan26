@@ -11,8 +11,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 export type User = {
   id: string
-  auth_id: string
   email: string
+  first_name?: string
+  last_name?: string
   name: string
   batch?: string
   company?: string
@@ -25,10 +26,14 @@ export type User = {
   phone?: string
   is_verified: boolean
   is_mentor: boolean
+  is_admin: boolean
+  is_blocked: boolean
+  email_verified: boolean
   mentor_expertise?: string
   created_at: string
   updated_at: string
-  last_signed_in: string
+  last_signed_in?: string
+  [key: string]: any
 }
 
 export type Job = {
@@ -45,6 +50,7 @@ export type Job = {
   status: 'active' | 'closed' | 'archived'
   views_count: number
   applications_count: number
+  created_at: string
 }
 
 export type Event = {

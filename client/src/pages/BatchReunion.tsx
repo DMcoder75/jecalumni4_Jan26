@@ -298,23 +298,15 @@ export default function BatchReunion() {
                     <Card key={member.id} className="p-4">
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <h4 className="font-bold text-foreground">{member.name}</h4>
-                          <p className="text-sm text-primary font-semibold">
-                            {member.designation || 'Professional'}
-                          </p>
+                          <h4 className="font-bold text-foreground">{member.name || `${member.first_name} ${member.last_name}`}</h4>
+                          <p className="text-sm text-muted-foreground">{member.designation} @ {member.company}</p>
                         </div>
-                        {member.email_verified && (
-                          <UserCheck className="w-5 h-5 text-green-500" />
-                        )}
+                        <Badge variant="outline">Member</Badge>
                       </div>
-
-                      {member.company && (
-                        <p className="text-sm text-muted-foreground mb-2">{member.company}</p>
-                      )}
-
-                      {member.location && (
-                        <p className="text-xs text-muted-foreground">{member.location}</p>
-                      )}
+                      <div className="flex gap-2">
+                        <Button variant="ghost" size="sm" className="text-xs">View Profile</Button>
+                        <Button variant="ghost" size="sm" className="text-xs">Message</Button>
+                      </div>
                     </Card>
                   ))}
                 </div>
@@ -324,148 +316,82 @@ export default function BatchReunion() {
             {/* Events Tab */}
             <TabsContent value="events" className="space-y-4">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold text-foreground">Reunion Events</h2>
-                {user?.id === selectedBatch.coordinator_id && (
-                  <Dialog open={showCreateEventDialog} onOpenChange={setShowCreateEventDialog}>
-                    <DialogTrigger asChild>
-                      <Button className="bg-primary hover:bg-primary/90">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Create Event
+                <h2 className="text-2xl font-bold text-foreground">Batch Events</h2>
+                <Dialog open={showCreateEventDialog} onOpenChange={setShowCreateEventDialog}>
+                  <DialogTrigger asChild>
+                    <Button size="sm">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Event
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Batch Event</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleCreateEvent} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="event_title">Title</Label>
+                        <Input
+                          id="event_title"
+                          value={eventFormData.title}
+                          onChange={(e) => setEventFormData({...eventFormData, title: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="event_date">Date</Label>
+                        <Input
+                          id="event_date"
+                          type="datetime-local"
+                          value={eventFormData.event_date}
+                          onChange={(e) => setEventFormData({...eventFormData, event_date: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="event_location">Location</Label>
+                        <Input
+                          id="event_location"
+                          value={eventFormData.location}
+                          onChange={(e) => setEventFormData({...eventFormData, location: e.target.value})}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="event_desc">Description</Label>
+                        <Textarea
+                          id="event_desc"
+                          value={eventFormData.description}
+                          onChange={(e) => setEventFormData({...eventFormData, description: e.target.value})}
+                        />
+                      </div>
+                      <Button type="submit" className="w-full" disabled={creating}>
+                        {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create Event'}
                       </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-2xl">
-                      <DialogHeader>
-                        <DialogTitle>Create Reunion Event</DialogTitle>
-                      </DialogHeader>
-                      <form onSubmit={handleCreateEvent} className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="title">Event Title</Label>
-                          <Input
-                            id="title"
-                            placeholder="e.g., Batch 2020 Reunion Dinner"
-                            value={eventFormData.title}
-                            onChange={(e) =>
-                              setEventFormData({ ...eventFormData, title: e.target.value })
-                            }
-                            required
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="event_date">Date & Time</Label>
-                            <Input
-                              id="event_date"
-                              type="datetime-local"
-                              value={eventFormData.event_date}
-                              onChange={(e) =>
-                                setEventFormData({
-                                  ...eventFormData,
-                                  event_date: e.target.value,
-                                })
-                              }
-                              required
-                            />
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="location">Location</Label>
-                            <Input
-                              id="location"
-                              placeholder="e.g., JEC Campus, Jabalpur"
-                              value={eventFormData.location}
-                              onChange={(e) =>
-                                setEventFormData({
-                                  ...eventFormData,
-                                  location: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label htmlFor="description">Description</Label>
-                          <Textarea
-                            id="description"
-                            placeholder="Describe the reunion event..."
-                            value={eventFormData.description}
-                            onChange={(e) =>
-                              setEventFormData({
-                                ...eventFormData,
-                                description: e.target.value,
-                              })
-                            }
-                            className="min-h-24"
-                          />
-                        </div>
-
-                        <div className="flex gap-2">
-                          <Button
-                            type="submit"
-                            className="flex-1 bg-primary hover:bg-primary/90"
-                            disabled={creating}
-                          >
-                            {creating ? (
-                              <>
-                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                Creating...
-                              </>
-                            ) : (
-                              'Create Event'
-                            )}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setShowCreateEventDialog(false)}
-                            disabled={creating}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      </form>
-                    </DialogContent>
-                  </Dialog>
-                )}
+                    </form>
+                  </DialogContent>
+                </Dialog>
               </div>
-
               {batchEvents.length === 0 ? (
                 <Card className="p-12 text-center">
                   <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">No reunion events scheduled yet</p>
+                  <p className="text-muted-foreground">No events scheduled for this batch</p>
                 </Card>
               ) : (
                 <div className="space-y-4">
                   {batchEvents.map((event) => (
                     <Card key={event.id} className="p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-bold text-foreground mb-2">
-                            {event.title}
-                          </h3>
-                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="w-4 h-4" />
-                              {formatDate(event.event_date)}
-                            </span>
-                            {event.location && (
-                              <span>{event.location}</span>
-                            )}
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-xl font-bold mb-2">{event.title}</h3>
+                          <div className="flex gap-4 text-sm text-muted-foreground mb-4">
+                            <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {formatDate(event.event_date)}</span>
+                            <span className="flex items-center gap-1"><UserCheck className="w-4 h-4" /> {event.registrations_count} attending</span>
                           </div>
+                          <p className="text-muted-foreground">{event.description}</p>
                         </div>
-                        <Badge variant="secondary">
-                          {event.registrations_count} registered
-                        </Badge>
+                        <Button>RSVP</Button>
                       </div>
-
-                      {event.description && (
-                        <p className="text-muted-foreground mb-4">{event.description}</p>
-                      )}
-
-                      <Button variant="outline" className="w-full">
-                        View & RSVP
-                      </Button>
                     </Card>
                   ))}
                 </div>
@@ -473,17 +399,10 @@ export default function BatchReunion() {
             </TabsContent>
 
             {/* Messaging Tab */}
-            <TabsContent value="messaging" className="space-y-4">
-              <h2 className="text-2xl font-bold text-foreground mb-4">
-                Batch {selectedBatch.batch_year} Group Chat
-              </h2>
-              <Card className="p-12 text-center">
-                <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">Group messaging coming soon</p>
-                <p className="text-sm text-muted-foreground">
-                  Connect with your batch mates in real-time
-                </p>
-              </Card>
+            <TabsContent value="messaging" className="p-12 text-center">
+              <MessageSquare className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Batch Group Chat</h3>
+              <p className="text-muted-foreground">Coming soon for Batch {selectedBatch.batch_year}</p>
             </TabsContent>
           </Tabs>
         )}

@@ -38,7 +38,7 @@ export default function Jobs() {
         .from('jobs')
         .select('*')
         .eq('status', 'active')
-        .order('posted_at', { ascending: false })
+        .order('created_at', { ascending: false })
 
       if (searchQuery) {
         query = query.or(`title.ilike.%${searchQuery}%,company.ilike.%${searchQuery}%`)

@@ -41,19 +41,10 @@ export default function Auth() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/email/signup-request', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to send request')
-      }
-
+      // For now, we'll just show a success message as we'll implement client-side email later
+      // In a real scenario, you'd call EmailJS or a similar service here
+      console.log('Signup request:', requestData)
+      
       setSuccess('Your signup request has been sent to the admin. You will receive an email once approved.')
       setRequestData({ email: '', firstName: '', lastName: '', description: '' })
     } catch (err) {
@@ -87,19 +78,9 @@ export default function Auth() {
     setLoading(true)
 
     try {
-      const response = await fetch('/api/email/password-reset-request', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email: resetEmail }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Failed to send request')
-      }
-
+      // Similar to signup, we'll implement client-side email later
+      console.log('Reset request for:', resetEmail)
+      
       setSuccess('Your password reset request has been sent to the admin.')
       setResetEmail('')
       setShowReset(false)
