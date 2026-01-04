@@ -1,7 +1,7 @@
+import emailjs from '@emailjs/browser';
+
 /**
- * Client-side email service utility.
- * This can be integrated with services like EmailJS, SendGrid (via API), or simply a mailto link.
- * For now, we'll implement a mock that logs to console and can be easily replaced with EmailJS.
+ * Client-side email service utility using EmailJS.
  */
 
 export interface EmailParams {
@@ -9,38 +9,58 @@ export interface EmailParams {
   to_name: string;
   subject: string;
   message: string;
+  password?: string; // Added for password sharing
   [key: string]: any;
 }
 
-export const sendEmail = async (params: EmailParams): Promise<boolean> => {
-  console.log('Sending email via client-side service:', params);
+// EmailJS Configuration from environment variables
+const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_v1qt4hi';
+const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'v34hG0heoHqlXDIId';
+const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_sendpwd'; 
+const ADMIN_TEMPLATE_ID = 'template_newuser';
+
+export const sendEmail = async (params: EmailParams, templateId: string = TEMPLATE_ID): Promise<boolean> => {
+  console.log('Sending email via EmailJS:', params);
   
-  // Example integration with EmailJS (requires account setup)
-  /*
   try {
-    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        service_id: 'YOUR_SERVICE_ID',
-        template_id: 'YOUR_TEMPLATE_ID',
-        user_id: 'YOUR_PUBLIC_KEY',
-        template_params: params
-      })
-    });
-    return response.ok;
+    const result = await emailjs.send(
+      SERVICE_ID,
+      templateId,
+      {
+        to_email: params.to_email,
+        to_name: params.to_name,
+        subject: params.subject,
+        message: params.message,
+        password: params.password || '', // Ensure password is sent if available
+        ...params
+      },
+      PUBLIC_KEY
+    );
+    
+    console.log('EmailJS Success:', result.text);
+    return true;
   } catch (error) {
-    console.error('EmailJS error:', error);
+    console.error('EmailJS Error:', error);
     return false;
   }
-  */
+};
 
-  // Mock success
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      console.log('Email sent successfully (mock)');
-      resolve(true);
-    }, 1000);
+/**
+ * Specifically for sending user credentials
+ */
+export const sendUserCredentials = async (email: string, name: string, password: string, isNewAccount: boolean = true) => {
+  const subject = isNewAccount ? 'Account Approved - JEC MCA Alumni' : 'Password Reset - JEC MCA Alumni';
+  const message = isNewAccount 
+    ? `Hello ${name},\n\nYour account has been approved. Your login credentials are provided below.`
+    : `Hello ${name},\n\nYour password has been reset by the administrator. Your new login credentials are provided below.`;
+
+  return sendEmail({
+    to_email: email,
+    to_name: name,
+    subject,
+    message,
+    password, // This will be mapped to {{password}} in EmailJS template
+    login_url: 'https://jecmcaalumni.web.app/auth'
   });
 };
 
@@ -68,6 +88,7 @@ export const sendAdminNotification = async (type: string, data: any) => {
     to_email: adminEmail,
     to_name: 'Admin',
     subject,
-    message
-  });
+    message,
+    ...data // Pass all data to template
+  }, ADMIN_TEMPLATE_ID);
 };

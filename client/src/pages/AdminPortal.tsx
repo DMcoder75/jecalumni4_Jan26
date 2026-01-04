@@ -23,7 +23,7 @@ import {
 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { sendEmail } from '@/lib/email'
+import { sendEmail, sendUserCredentials } from '@/lib/email'
 
 interface AdminStats {
   totalUsers: number
@@ -142,12 +142,7 @@ export default function AdminPortal() {
       if (error) throw error
 
       // Send approval email via client-side service
-      await sendEmail({
-        to_email: userEmail,
-        to_name: userName,
-        subject: 'Account Approved - JEC MCA Alumni',
-        message: `Hello ${userName},\n\nYour account has been approved. \n\nYour login credentials are:\nEmail: ${userEmail}\nPassword: ${generatedPassword}\n\nYou can now log in to the JEC MCA Alumni platform at https://jecmcaalumni.web.app/auth`
-      })
+      await sendUserCredentials(userEmail, userName, generatedPassword, true)
 
       toast.success('User approved and credentials emailed!')
       fetchAdminData()
@@ -179,12 +174,7 @@ export default function AdminPortal() {
       if (error) throw error
 
       // Send email with new password
-      await sendEmail({
-        to_email: userEmail,
-        to_name: userName,
-        subject: 'Password Reset - JEC MCA Alumni',
-        message: `Hello ${userName},\n\nYour password has been reset by the administrator. \n\nYour new login credentials are:\nEmail: ${userEmail}\nPassword: ${newPassword}\n\nYou can log in at https://jecmcaalumni.web.app/auth`
-      })
+      await sendUserCredentials(userEmail, userName, newPassword, false)
 
       toast.success('Password reset and new credentials emailed!')
     } catch (error) {
