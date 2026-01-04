@@ -58,6 +58,12 @@ export default function AdminPortal() {
   useEffect(() => {
     if (user) {
       checkAdminStatus()
+    } else {
+      // If no user after some time, stop loading
+      const timer = setTimeout(() => {
+        if (!user) setLoading(false)
+      }, 2000)
+      return () => clearTimeout(timer)
     }
   }, [user])
 
