@@ -92,12 +92,21 @@ export default function Navigation() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button
-                onClick={() => setLocation('/auth')}
-                className="bg-primary hover:bg-primary/90"
-              >
-                Sign In
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  onClick={() => setLocation('/auth')}
+                  className="text-sm font-medium"
+                >
+                  Sign In
+                </Button>
+                <Button
+                  onClick={() => setLocation('/auth')}
+                  className="bg-primary hover:bg-primary/90"
+                >
+                  Get Started
+                </Button>
+              </div>
             )}
           </div>
 

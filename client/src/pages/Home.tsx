@@ -62,26 +62,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary">
-      {/* Header */}
-      <header className="border-b border-border bg-background sticky top-0 z-50">
-        <div className="container flex items-center justify-between h-16">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">JEC</span>
-            </div>
-            <div>
-              <h1 className="font-bold text-lg text-foreground">JEC MCA</h1>
-              <p className="text-xs text-muted-foreground">Alumni Network</p>
-            </div>
-          </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium hover:text-primary transition">Features</a>
-            <a href="#stats" className="text-sm font-medium hover:text-primary transition">Impact</a>
-            <a href="#architecture" className="text-sm font-medium hover:text-primary transition">Architecture</a>
-            <Button onClick={() => setLocation('/auth')} className="bg-primary hover:bg-primary/90">Get Started</Button>
-          </nav>
-        </div>
-      </header>
+
 
       {/* Hero Section */}
       <section className="container py-20 md:py-32">
