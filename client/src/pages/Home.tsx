@@ -63,24 +63,23 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative py-24 md:py-40 overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-full bg-[#D0D6B5] -z-10" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 85%, 0 100%)' }}></div>
+      <section className="relative py-32 md:py-48 overflow-hidden bg-white">
         <div className="container relative z-10">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className="inline-block px-6 py-2 bg-white shadow-sm rounded-full mb-4">
-              <p className="text-base font-bold text-[#EE7674]">🎓 JEC MCA Alumni Network</p>
-            </div>
-            <h2 className="text-5xl md:text-7xl font-black text-[#1F1F1F] leading-tight tracking-tight">
+          <div className="max-w-5xl mx-auto text-center space-y-10">
+            <h1 className="text-6xl md:text-8xl font-black text-[#987284] leading-tight tracking-tighter mb-4">
+              🎓 JEC MCA Alumni Network
+            </h1>
+            <h2 className="text-4xl md:text-6xl font-bold text-[#1F1F1F] leading-tight tracking-tight">
               Connect, Grow, <span className="text-[#EE7674]">Succeed</span>
             </h2>
-            <p className="text-xl text-[#4A4A4A] max-w-2xl mx-auto font-medium">
+            <p className="text-2xl text-[#4A4A4A] max-w-3xl mx-auto font-medium leading-relaxed">
               A comprehensive digital platform designed to foster lifelong connections among Jabalpur Engineering College MCA alumni, facilitating networking, career development, and community engagement.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-              <Button onClick={() => setLocation('/auth')} size="lg" className="bg-[#EE7674] hover:bg-[#EE7674]/90 text-white px-10 py-7 text-lg font-bold shadow-lg">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center pt-10">
+              <Button onClick={() => setLocation('/auth')} size="lg" className="bg-[#EE7674] hover:bg-[#EE7674]/90 text-white px-12 py-8 text-xl font-black shadow-xl">
                 Explore Platform
               </Button>
-              <Button onClick={() => setLocation('/auth')} size="lg" variant="outline" className="bg-white border-2 border-[#EE7674] text-[#EE7674] hover:bg-[#EE7674]/10 px-10 py-7 text-lg font-bold">
+              <Button onClick={() => setLocation('/auth')} size="lg" variant="outline" className="bg-white border-2 border-[#EE7674] text-[#EE7674] hover:bg-[#EE7674]/10 px-12 py-8 text-xl font-black">
                 Learn More
               </Button>
             </div>
@@ -264,7 +263,7 @@ export default function Home() {
               <div className="w-12 h-12 bg-[#EE7674] rounded-xl flex items-center justify-center shadow-lg">
                 <span className="text-white font-black text-xl">JEC</span>
               </div>
-              <span className="text-2xl font-black tracking-tighter">JEC MCA Alumni</span>
+              <span className="text-2xl font-black tracking-tighter">JEC MCA Alumni Network</span>
             </div>
             <div className="flex gap-10 text-base font-bold">
               <a href="#" className="hover:text-[#EE7674] transition-colors">Privacy Policy</a>
