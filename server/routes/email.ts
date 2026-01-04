@@ -7,7 +7,11 @@ import {
   getEventReminderTemplate,
   getMentorshipRequestTemplate,
   getMessageNotificationTemplate,
+  getSignupRequestTemplate,
+  getPasswordResetRequestTemplate,
 } from '../email'
+import { upsertUser } from '../db'
+import { nanoid } from 'nanoid'
 
 const router = Router()
 
@@ -199,6 +203,82 @@ router.post('/message-notification', async (req, res) => {
     res.json({ success: true })
   } catch (error) {
     console.error('Error sending message notification email:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+/**
+ * POST /api/email/signup-request
+ * Send signup request to admin
+ */
+router.post('/signup-request', async (req, res) => {
+  try {
+    const { email, firstName, lastName, description } = req.body
+
+    if (!email || !firstName || !lastName || !description) {
+      return res.status(400).json({ error: 'Missing required fields' })
+    }
+
+    // Create a pending user in the database
+    await upsertUser({
+      openId: `pending_${nanoid()}`,
+      email,
+      firstName,
+      lastName,
+      name: `${firstName} ${lastName}`,
+      description,
+      emailVerified: false,
+      role: 'user',
+    })
+
+    const adminEmail = 'jecmcaalumni.noreply@gmail.com'
+    const html = getSignupRequestTemplate(email, firstName, lastName, description)
+
+    const success = await sendEmail({
+      to: adminEmail,
+      subject: `New Signup Request from ${email}`,
+      html,
+    })
+
+    if (!success) {
+      return res.status(500).json({ error: 'Failed to send email' })
+    }
+
+    res.json({ success: true })
+  } catch (error) {
+    console.error('Error sending signup request email:', error)
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
+/**
+ * POST /api/email/password-reset-request
+ * Send password reset request to admin
+ */
+router.post('/password-reset-request', async (req, res) => {
+  try {
+    const { email } = req.body
+
+    if (!email) {
+      return res.status(400).json({ error: 'Missing required fields' })
+    }
+
+    const adminEmail = 'jecmcaalumni.noreply@gmail.com'
+    const html = getPasswordResetRequestTemplate(email)
+
+    const success = await sendEmail({
+      to: adminEmail,
+      subject: `Password Reset Request from ${email}`,
+      html,
+    })
+
+    if (!success) {
+      return res.status(500).json({ error: 'Failed to send email' })
+    }
+
+    res.json({ success: true })
+  } catch (error) {
+    console.error('Error sending password reset request email:', error)
     res.status(500).json({ error: 'Internal server error' })
   }
 })

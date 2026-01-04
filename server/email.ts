@@ -297,3 +297,85 @@ export function getMessageNotificationTemplate(
     </html>
   `
 }
+
+/**
+ * Signup request email template
+ */
+export function getSignupRequestTemplate(
+  email: string,
+  firstName: string,
+  lastName: string,
+  description: string
+): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #8B3A3A; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+          .content { background-color: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
+          .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>JEC MCA Alumni Network - New Signup Request</h1>
+          </div>
+          <div class="content">
+            <p>Hello Admin,</p>
+            <p>A new user has requested access to the JEC MCA Alumni Network.</p>
+            <p><strong>User Name:</strong> ${firstName} ${lastName}</p>
+            <p><strong>User Email:</strong> ${email}</p>
+            <p><strong>Description:</strong></p>
+            <p>${description}</p>
+            <p>Please review this request and provide the login credentials if approved.</p>
+          </div>
+          <div class="footer">
+            <p>&copy; 2024 JEC MCA Alumni Network. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+}
+
+/**
+ * Password reset request email template
+ */
+export function getPasswordResetRequestTemplate(
+  email: string
+): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background-color: #8B3A3A; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
+          .content { background-color: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
+          .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>JEC MCA Alumni Network - Password Reset Request</h1>
+          </div>
+          <div class="content">
+            <p>Hello Admin,</p>
+            <p>A user has requested a password reset for their account.</p>
+            <p><strong>User Email:</strong> ${email}</p>
+            <p>Please provide the password reset instructions to the user.</p>
+          </div>
+          <div class="footer">
+            <p>&copy; 2024 JEC MCA Alumni Network. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+    </html>
+  `
+}

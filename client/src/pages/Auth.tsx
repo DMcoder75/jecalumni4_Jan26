@@ -4,22 +4,25 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircle, Loader2, CheckCircle2 } from 'lucide-react'
 import { useLocation } from 'wouter'
 
 export default function Auth() {
   const [, setLocation] = useLocation()
-  const { signUp, signIn } = useAuth()
+  const { signIn } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [showReset, setShowReset] = useState(false)
 
-  // Sign Up Form
-  const [signUpData, setSignUpData] = useState({
+  // Signup Request Form
+  const [requestData, setRequestData] = useState({
     email: '',
-    password: '',
-    confirmPassword: '',
-    name: '',
+    firstName: '',
+    lastName: '',
+    description: '',
   })
 
   // Sign In Form
@@ -28,25 +31,33 @@ export default function Auth() {
     password: '',
   })
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  // Password Reset Request Form
+  const [resetEmail, setResetEmail] = useState('')
+
+  const handleSignupRequest = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setLoading(true)
 
     try {
-      if (signUpData.password !== signUpData.confirmPassword) {
-        throw new Error('Passwords do not match')
+      const response = await fetch('/api/email/signup-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to send request')
       }
 
-      if (signUpData.password.length < 6) {
-        throw new Error('Password must be at least 6 characters')
-      }
-
-      await signUp(signUpData.email, signUpData.password, signUpData.name)
-      setSignUpData({ email: '', password: '', confirmPassword: '', name: '' })
-      setLocation('/profile-setup')
+      setSuccess('Your signup request has been sent to the admin. You will receive an email once approved.')
+      setRequestData({ email: '', firstName: '', lastName: '', description: '' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign up failed')
+      setError(err instanceof Error ? err.message : 'Request failed')
     } finally {
       setLoading(false)
     }
@@ -55,6 +66,7 @@ export default function Auth() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setLoading(true)
 
     try {
@@ -63,6 +75,36 @@ export default function Auth() {
       setLocation('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign in failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleResetRequest = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/email/password-reset-request', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: resetEmail }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to send request')
+      }
+
+      setSuccess('Your password reset request has been sent to the admin.')
+      setResetEmail('')
+      setShowReset(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Request failed')
     } finally {
       setLoading(false)
     }
@@ -87,43 +129,174 @@ export default function Auth() {
             </div>
           )}
 
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
+          {success && (
+            <div className="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-lg flex gap-3">
+              <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-green-600">{success}</p>
+            </div>
+          )}
 
-            {/* Sign In Tab */}
-            <TabsContent value="signin" className="space-y-4">
-              <form onSubmit={handleSignIn} className="space-y-4">
+          {!showReset ? (
+            <Tabs defaultValue="signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-6">
+                <TabsTrigger value="signin">Sign In</TabsTrigger>
+                <TabsTrigger value="signup">Request Access</TabsTrigger>
+              </TabsList>
+
+              {/* Sign In Tab */}
+              <TabsContent value="signin" className="space-y-4">
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email">Email</Label>
+                    <Input
+                      id="signin-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={signInData.email}
+                      onChange={(e) =>
+                        setSignInData({ ...signInData, email: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="signin-password">Password</Label>
+                      <button
+                        type="button"
+                        onClick={() => setShowReset(true)}
+                        className="text-xs text-primary hover:underline"
+                      >
+                        Forgot password?
+                      </button>
+                    </div>
+                    <Input
+                      id="signin-password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={signInData.password}
+                      onChange={(e) =>
+                        setSignInData({ ...signInData, password: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary hover:bg-primary/90"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      'Sign In'
+                    )}
+                  </Button>
+                </form>
+              </TabsContent>
+
+              {/* Signup Request Tab */}
+              <TabsContent value="signup" className="space-y-4">
+                <form onSubmit={handleSignupRequest} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="request-firstname">First Name</Label>
+                      <Input
+                        id="request-firstname"
+                        type="text"
+                        placeholder="John"
+                        value={requestData.firstName}
+                        onChange={(e) =>
+                          setRequestData({ ...requestData, firstName: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="request-lastname">Last Name</Label>
+                      <Input
+                        id="request-lastname"
+                        type="text"
+                        placeholder="Doe"
+                        value={requestData.lastName}
+                        onChange={(e) =>
+                          setRequestData({ ...requestData, lastName: e.target.value })
+                        }
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="request-email">Email</Label>
+                    <Input
+                      id="request-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={requestData.email}
+                      onChange={(e) =>
+                        setRequestData({ ...requestData, email: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="request-description">Tell us about yourself (Batch, Company, etc.)</Label>
+                    <Textarea
+                      id="request-description"
+                      placeholder="I am from the 2022 batch, currently working at..."
+                      value={requestData.description}
+                      onChange={(e) =>
+                        setRequestData({ ...requestData, description: e.target.value })
+                      }
+                      className="min-h-[100px]"
+                      required
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary hover:bg-primary/90"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Sending request...
+                      </>
+                    ) : (
+                      'Send Request'
+                    )}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+          ) : (
+            <div className="space-y-4">
+              <div className="text-center mb-4">
+                <h2 className="text-xl font-semibold">Reset Password</h2>
+                <p className="text-sm text-muted-foreground">
+                  Enter your email to request a password reset from the admin.
+                </p>
+              </div>
+              <form onSubmit={handleResetRequest} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="reset-email">Email</Label>
                   <Input
-                    id="signin-email"
+                    id="reset-email"
                     type="email"
                     placeholder="you@example.com"
-                    value={signInData.email}
-                    onChange={(e) =>
-                      setSignInData({ ...signInData, email: e.target.value })
-                    }
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
                     required
                   />
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
-                  <Input
-                    id="signin-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={signInData.password}
-                    onChange={(e) =>
-                      setSignInData({ ...signInData, password: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
                 <Button
                   type="submit"
                   className="w-full bg-primary hover:bg-primary/90"
@@ -132,97 +305,27 @@ export default function Auth() {
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Signing in...
+                      Sending request...
                     </>
                   ) : (
-                    'Sign In'
+                    'Send Reset Request'
                   )}
                 </Button>
-              </form>
-            </TabsContent>
-
-            {/* Sign Up Tab */}
-            <TabsContent value="signup" className="space-y-4">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
-                  <Input
-                    id="signup-name"
-                    type="text"
-                    placeholder="John Doe"
-                    value={signUpData.name}
-                    onChange={(e) =>
-                      setSignUpData({ ...signUpData, name: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={signUpData.email}
-                    onChange={(e) =>
-                      setSignUpData({ ...signUpData, email: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={signUpData.password}
-                    onChange={(e) =>
-                      setSignUpData({ ...signUpData, password: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="signup-confirm">Confirm Password</Label>
-                  <Input
-                    id="signup-confirm"
-                    type="password"
-                    placeholder="••••••••"
-                    value={signUpData.confirmPassword}
-                    onChange={(e) =>
-                      setSignUpData({
-                        ...signUpData,
-                        confirmPassword: e.target.value,
-                      })
-                    }
-                    required
-                  />
-                </div>
-
                 <Button
-                  type="submit"
-                  className="w-full bg-primary hover:bg-primary/90"
+                  type="button"
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => setShowReset(false)}
                   disabled={loading}
                 >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Creating account...
-                    </>
-                  ) : (
-                    'Create Account'
-                  )}
+                  Back to Sign In
                 </Button>
               </form>
-            </TabsContent>
-          </Tabs>
+            </div>
+          )}
 
           <p className="text-xs text-muted-foreground text-center mt-6">
-            By signing up, you agree to our Terms of Service and Privacy Policy
+            By using this platform, you agree to our Terms of Service and Privacy Policy
           </p>
         </div>
       </Card>

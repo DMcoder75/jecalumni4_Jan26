@@ -1,12 +1,20 @@
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, User as UserIcon, LogOut, LayoutDashboard, MessageSquare } from 'lucide-react'
 import { useState } from 'react'
 import { useLocation } from 'wouter'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function Navigation() {
   const [, setLocation] = useLocation()
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const navLinks = [
@@ -18,10 +26,10 @@ export default function Navigation() {
     { label: 'Feed', href: '/feed' },
   ]
 
-  const userLinks = [
-    { label: 'Messages', href: '/messages' },
-    { label: 'Dashboard', href: '/dashboard' },
-  ]
+  const handleSignOut = async () => {
+    await signOut()
+    setLocation('/auth')
+  }
 
   return (
     <nav className="sticky top-0 z-50 bg-background border-b border-border">
@@ -54,17 +62,35 @@ export default function Navigation() {
           {/* Right Side */}
           <div className="hidden md:flex items-center gap-4">
             {user ? (
-              <>
-                {userLinks.map((link) => (
-                  <button
-                    key={link.href}
-                    onClick={() => setLocation(link.href)}
-                    className="text-sm font-medium text-foreground hover:text-primary transition-colors"
-                  >
-                    {link.label}
-                  </button>
-                ))}
-              </>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2 hover:bg-secondary">
+                    <span className="text-sm font-medium">Hi {user.firstName || user.name?.split(' ')[0] || 'User'}</span>
+                    <UserIcon className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => setLocation('/dashboard')}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>Dashboard</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLocation('/messages')}>
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    <span>Messages</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLocation('/profile-setup')}>
+                    <UserIcon className="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <Button
                 onClick={() => setLocation('/auth')}
@@ -104,20 +130,35 @@ export default function Navigation() {
               </button>
             ))}
             {user ? (
-              <>
-                {userLinks.map((link) => (
-                  <button
-                    key={link.href}
-                    onClick={() => {
-                      setLocation(link.href)
-                      setMobileMenuOpen(false)
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary rounded-lg transition-colors"
-                  >
-                    {link.label}
-                  </button>
-                ))}
-              </>
+              <div className="pt-4 border-t border-border space-y-3">
+                <p className="px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Hi {user.firstName || user.name?.split(' ')[0] || 'User'}
+                </p>
+                <button
+                  onClick={() => { setLocation('/dashboard'); setMobileMenuOpen(false); }}
+                  className="block w-full text-left px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary rounded-lg transition-colors"
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={() => { setLocation('/messages'); setMobileMenuOpen(false); }}
+                  className="block w-full text-left px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary rounded-lg transition-colors"
+                >
+                  Messages
+                </button>
+                <button
+                  onClick={() => { setLocation('/profile-setup'); setMobileMenuOpen(false); }}
+                  className="block w-full text-left px-4 py-2 text-sm font-medium text-foreground hover:bg-secondary rounded-lg transition-colors"
+                >
+                  Profile
+                </button>
+                <button
+                  onClick={() => { handleSignOut(); setMobileMenuOpen(false); }}
+                  className="block w-full text-left px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
+                >
+                  Sign out
+                </button>
+              </div>
             ) : (
               <Button
                 onClick={() => {
