@@ -40,77 +40,84 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* Custom Branding Colors */
+  --color-brand-pink: #987284;
+  --color-brand-blue: #9DBF9E;
+  --color-brand-beige: #D0D6B5;
+  --color-brand-melon: #F9B5AC;
+  --color-brand-coral: #EE7674;
 }
 
 :root {
-  /* JEC MCA Color Scheme - Maroon and Gold */
-  --primary: #8B1538;
+  /* JEC MCA New Color Scheme */
+  --primary: #EE7674; /* Light coral - Header color */
   --primary-foreground: #FFFFFF;
-  --secondary: #D4AF37;
+  --secondary: #D0D6B5; /* Beige */
   --secondary-foreground: #1F1F1F;
-  --accent: #D4AF37;
+  --accent: #9DBF9E; /* Cambridge blue */
   --accent-foreground: #1F1F1F;
-  --sidebar-primary: #8B1538;
+  --sidebar-primary: #EE7674;
   --sidebar-primary-foreground: #FFFFFF;
-  --chart-1: #8B1538;
-  --chart-2: #D4AF37;
-  --chart-3: #0066CC;
-  --chart-4: #6B4423;
-  --chart-5: #A0522D;
-  --radius: 0.65rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.235 0.015 65);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.015 65);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.235 0.015 65);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: #8B1538;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.235 0.015 65);
-  --sidebar-accent: #D4AF37;
+  --chart-1: #987284;
+  --chart-2: #9DBF9E;
+  --chart-3: #D0D6B5;
+  --chart-4: #F9B5AC;
+  --chart-5: #EE7674;
+  --radius: 0.5rem;
+  --background: #FFFFFF;
+  --foreground: #1F1F1F;
+  --card: #FFFFFF;
+  --card-foreground: #1F1F1F;
+  --popover: #FFFFFF;
+  --popover-foreground: #1F1F1F;
+  --muted: #F9B5AC;
+  --muted-foreground: #4A4A4A;
+  --destructive: #EE7674;
+  --destructive-foreground: #FFFFFF;
+  --border: #D0D6B5;
+  --input: #D0D6B5;
+  --ring: #EE7674;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1F1F1F;
+  --sidebar-accent: #9DBF9E;
   --sidebar-accent-foreground: #1F1F1F;
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: #8B1538;
+  --sidebar-border: #D0D6B5;
+  --sidebar-ring: #EE7674;
 }
 
 .dark {
-  --primary: #A84159;
+  --primary: #EE7674;
   --primary-foreground: #FFFFFF;
-  --secondary: #D4AF37;
-  --sidebar-primary: #A84159;
+  --secondary: #987284;
+  --sidebar-primary: #EE7674;
   --sidebar-primary-foreground: #FFFFFF;
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.85 0.005 65);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.85 0.005 65);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.85 0.005 65);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: #D4AF37;
+  --background: #1F1F1F;
+  --foreground: #FFFFFF;
+  --card: #2D2D2D;
+  --card-foreground: #FFFFFF;
+  --popover: #2D2D2D;
+  --popover-foreground: #FFFFFF;
+  --muted: #987284;
+  --muted-foreground: #D0D6B5;
+  --accent: #9DBF9E;
   --accent-foreground: #1F1F1F;
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: #A84159;
-  --chart-1: #A84159;
-  --chart-2: #D4AF37;
-  --chart-3: #0066CC;
-  --chart-4: #8B6B47;
-  --chart-5: #CD853F;
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.85 0.005 65);
-  --sidebar-accent: #D4AF37;
+  --destructive: #EE7674;
+  --destructive-foreground: #FFFFFF;
+  --border: #4A4A4A;
+  --input: #4A4A4A;
+  --ring: #EE7674;
+  --chart-1: #987284;
+  --chart-2: #9DBF9E;
+  --chart-3: #D0D6B5;
+  --chart-4: #F9B5AC;
+  --chart-5: #EE7674;
+  --sidebar: #1F1F1F;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-accent: #9DBF9E;
   --sidebar-accent-foreground: #1F1F1F;
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: #A84159;
+  --sidebar-border: #4A4A4A;
+  --sidebar-ring: #EE7674;
 }
 
 @layer base {
@@ -134,24 +141,11 @@
 }
 
 @layer components {
-  /**
-   * Custom container utility that centers content and adds responsive padding.
-   *
-   * This overrides Tailwind's default container behavior to:
-   * - Auto-center content (mx-auto)
-   * - Add responsive horizontal padding
-   * - Set max-width for large screens
-   *
-   * Usage: <div className="container">...</div>
-   *
-   * For custom widths, use max-w-* utilities directly:
-   * <div className="max-w-6xl mx-auto px-4">...</div>
-   */
   .container {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 1rem; /* 16px - mobile padding */
+    padding-left: 1rem;
     padding-right: 1rem;
   }
 
@@ -162,16 +156,16 @@
 
   @media (min-width: 640px) {
     .container {
-      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-left: 1.5rem;
       padding-right: 1.5rem;
     }
   }
 
   @media (min-width: 1024px) {
     .container {
-      padding-left: 2rem; /* 32px - desktop padding */
+      padding-left: 2rem;
       padding-right: 2rem;
-      max-width: 1280px; /* Standard content width */
+      max-width: 1280px;
     }
   }
 }

@@ -101,7 +101,7 @@ export default function Events() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
@@ -242,7 +242,7 @@ export default function Events() {
         </div>
 
         {/* Filter */}
-        <Card className="p-6 mb-8">
+        <Card className="p-6 mb-8 border-2 border-[#F9B5AC]">
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}

@@ -250,7 +250,7 @@ export default function AdminPortal() {
   const activeUsers = filteredUsers.filter(u => u.email_verified)
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <h1 className="text-4xl font-bold text-foreground">Admin Portal</h1>
@@ -267,40 +267,40 @@ export default function AdminPortal() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6">
+          <Card className="p-6 border-2 border-[#987284]/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Total Users</p>
-                <p className="text-3xl font-bold text-foreground">{stats.totalUsers}</p>
+                <p className="text-sm font-bold text-[#987284] mb-1 uppercase tracking-wider">Total Users</p>
+                <p className="text-3xl font-black text-[#1F1F1F]">{stats.totalUsers}</p>
               </div>
-              <Users className="w-8 h-8 text-primary opacity-50" />
+              <Users className="w-8 h-8 text-[#987284]" />
             </div>
           </Card>
-          <Card className="p-6">
+          <Card className="p-6 border-2 border-[#EE7674]/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Pending Requests</p>
-                <p className="text-3xl font-bold text-foreground">{pendingUsers.length}</p>
+                <p className="text-sm font-bold text-[#EE7674] mb-1 uppercase tracking-wider">Pending Requests</p>
+                <p className="text-3xl font-black text-[#1F1F1F]">{pendingUsers.length}</p>
               </div>
-              <UserPlus className="w-8 h-8 text-amber-500 opacity-50" />
+              <UserPlus className="w-8 h-8 text-[#EE7674]" />
             </div>
           </Card>
-          <Card className="p-6">
+          <Card className="p-6 border-2 border-[#9DBF9E]/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Active Jobs</p>
-                <p className="text-3xl font-bold text-foreground">{stats.totalJobs}</p>
+                <p className="text-sm font-bold text-[#9DBF9E] mb-1 uppercase tracking-wider">Active Jobs</p>
+                <p className="text-3xl font-black text-[#1F1F1F]">{stats.totalJobs}</p>
               </div>
-              <BarChart3 className="w-8 h-8 text-primary opacity-50" />
+              <BarChart3 className="w-8 h-8 text-[#9DBF9E]" />
             </div>
           </Card>
-          <Card className="p-6">
+          <Card className="p-6 border-2 border-[#D0D6B5]/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Pending Content</p>
-                <p className="text-3xl font-bold text-foreground">{stats.pendingContent}</p>
+                <p className="text-sm font-bold text-[#D0D6B5] mb-1 uppercase tracking-wider">Pending Content</p>
+                <p className="text-3xl font-black text-[#1F1F1F]">{stats.pendingContent}</p>
               </div>
-              <FileText className="w-8 h-8 text-primary opacity-50" />
+              <FileText className="w-8 h-8 text-[#D0D6B5]" />
             </div>
           </Card>
         </div>

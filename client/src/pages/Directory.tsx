@@ -98,7 +98,7 @@ export default function Directory() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary py-12 px-4">
+    <div className="min-h-screen bg-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -109,7 +109,7 @@ export default function Directory() {
         </div>
 
         {/* Search and Filters */}
-        <Card className="p-6 mb-8">
+        <Card className="p-6 mb-8 border-2 border-[#D0D6B5]">
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="flex gap-2">
               <div className="flex-1 relative">
@@ -194,8 +194,8 @@ export default function Directory() {
             {alumni.map((alum) => (
               <Card key={alum.id} className="p-6 hover:shadow-lg transition-shadow">
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-primary font-bold text-lg">
+                  <div className="w-12 h-12 bg-[#EE7674]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-[#EE7674] font-bold text-lg">
                       {alum.name?.charAt(0) || '?'}
                     </span>
                   </div>

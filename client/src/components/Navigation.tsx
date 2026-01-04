@@ -32,7 +32,7 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-background border-b border-border">
+    <nav className="sticky top-0 z-50 bg-[#EE7674] border-b border-border">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -40,10 +40,10 @@ export default function Navigation() {
             onClick={() => setLocation('/')}
             className="flex items-center gap-2 font-bold text-lg text-primary hover:opacity-80 transition-opacity"
           >
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">JEC</span>
+            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+              <span className="text-[#EE7674] font-bold text-sm">JEC</span>
             </div>
-            <span className="hidden sm:inline">JEC MCA</span>
+            <span className="hidden sm:inline text-white">JEC MCA</span>
           </button>
 
           {/* Desktop Navigation */}
@@ -52,7 +52,7 @@ export default function Navigation() {
               <button
                 key={link.href}
                 onClick={() => setLocation(link.href)}
-                className="text-sm font-medium text-foreground hover:text-primary transition-colors"
+                className="text-sm font-medium text-white hover:text-white/80 transition-colors"
               >
                 {link.label}
               </button>
@@ -64,7 +64,7 @@ export default function Navigation() {
             {user ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2 hover:bg-secondary">
+                  <Button variant="ghost" className="flex items-center gap-2 text-white hover:bg-white/10">
                     <span className="text-sm font-medium">Hi {user.first_name || user.name?.split(' ')[0] || 'User'}</span>
                     <UserIcon className="w-4 h-4" />
                   </Button>
@@ -102,13 +102,13 @@ export default function Navigation() {
                 <Button
                   variant="ghost"
                   onClick={() => setLocation('/auth')}
-                  className="text-sm font-medium"
+                  className="text-sm font-medium text-white hover:bg-white/10"
                 >
                   Sign In
                 </Button>
                 <Button
                   onClick={() => setLocation('/auth')}
-                  className="bg-primary hover:bg-primary/90"
+                  className="bg-white text-[#EE7674] hover:bg-white/90"
                 >
                   Get Started
                 </Button>
@@ -119,12 +119,12 @@ export default function Navigation() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 hover:bg-secondary rounded-lg transition-colors"
+            className="md:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
           >
             {mobileMenuOpen ? (
-              <X className="w-6 h-6 text-foreground" />
+              <X className="w-6 h-6 text-white" />
             ) : (
-              <Menu className="w-6 h-6 text-foreground" />
+              <Menu className="w-6 h-6 text-white" />
             )}
           </button>
         </div>
