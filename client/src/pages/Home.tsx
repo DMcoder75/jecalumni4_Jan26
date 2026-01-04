@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Users, Briefcase, Calendar, Star, MessageSquare, Trophy, TrendingUp, Heart } from "lucide-react";
 import { useState } from "react";
+import { useLocation } from "wouter";
 
 export default function Home() {
+  const [, setLocation] = useLocation();
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
 
   const features = [
@@ -76,7 +78,7 @@ export default function Home() {
             <a href="#features" className="text-sm font-medium hover:text-primary transition">Features</a>
             <a href="#stats" className="text-sm font-medium hover:text-primary transition">Impact</a>
             <a href="#architecture" className="text-sm font-medium hover:text-primary transition">Architecture</a>
-            <Button className="bg-primary hover:bg-primary/90">Get Started</Button>
+            <Button onClick={() => setLocation('/auth')} className="bg-primary hover:bg-primary/90">Get Started</Button>
           </nav>
         </div>
       </header>
@@ -94,10 +96,10 @@ export default function Home() {
             A comprehensive digital platform designed to foster lifelong connections among Jabalpur Engineering College MCA alumni, facilitating networking, career development, and community engagement.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-            <Button size="lg" className="bg-primary hover:bg-primary/90">
+            <Button onClick={() => setLocation('/auth')} size="lg" className="bg-primary hover:bg-primary/90">
               Explore Platform
             </Button>
-            <Button size="lg" variant="outline">
+            <Button onClick={() => setLocation('/auth')} size="lg" variant="outline">
               Learn More
             </Button>
           </div>
@@ -143,7 +145,7 @@ export default function Home() {
       <section id="stats" className="bg-primary/5 py-16 md:py-24 border-y border-border">
         <div className="container">
           <div className="text-center mb-12">
-            <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Platform Impact</h3>
+            <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Impact</h3>
             <p className="text-lg text-muted-foreground">Metrics that showcase the platform's reach and engagement</p>
           </div>
 
@@ -258,10 +260,10 @@ export default function Home() {
             Connect with fellow JEC MCA alumni, explore career opportunities, and grow together as a community.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-primary hover:bg-primary/90">
+            <Button onClick={() => setLocation('/auth')} size="lg" className="bg-primary hover:bg-primary/90">
               Create Account
             </Button>
-            <Button size="lg" variant="outline">
+            <Button onClick={() => setLocation('/auth')} size="lg" variant="outline">
               View Documentation
             </Button>
           </div>
@@ -271,38 +273,21 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-border bg-background py-12">
         <div className="container">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h4 className="font-bold text-foreground mb-4">JEC MCA Alumni</h4>
-              <p className="text-sm text-muted-foreground">Connecting alumni for lifelong growth and success.</p>
+          <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm">JEC</span>
+              </div>
+              <span className="font-bold text-foreground">JEC MCA Alumni</span>
             </div>
-            <div>
-              <h4 className="font-bold text-foreground mb-4">Platform</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition">Features</a></li>
-                <li><a href="#" className="hover:text-primary transition">Documentation</a></li>
-                <li><a href="#" className="hover:text-primary transition">Architecture</a></li>
-              </ul>
+            <div className="flex gap-8 text-sm text-muted-foreground">
+              <a href="#" className="hover:text-primary transition">Privacy Policy</a>
+              <a href="#" className="hover:text-primary transition">Terms of Service</a>
+              <a href="#" className="hover:text-primary transition">Contact Us</a>
             </div>
-            <div>
-              <h4 className="font-bold text-foreground mb-4">Community</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition">Alumni Directory</a></li>
-                <li><a href="#" className="hover:text-primary transition">Events</a></li>
-                <li><a href="#" className="hover:text-primary transition">Success Stories</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-foreground mb-4">About</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition">About JEC</a></li>
-                <li><a href="#" className="hover:text-primary transition">Contact</a></li>
-                <li><a href="#" className="hover:text-primary transition">Privacy Policy</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-border pt-8 text-center text-sm text-muted-foreground">
-            <p>&copy; 2025 Jabalpur Engineering College MCA Alumni Network. All rights reserved.</p>
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} JEC MCA Alumni Network. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>
