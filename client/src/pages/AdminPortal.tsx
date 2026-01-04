@@ -74,7 +74,10 @@ export default function AdminPortal() {
   const fetchAdminData = async () => {
     try {
       // Fetch all users from our API
-      const userResponse = await fetch('/api/admin/users')
+      const token = localStorage.getItem('session_token')
+      const userResponse = await fetch('/api/admin/users', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
       const userData = await userResponse.json()
       setAllUsers(userData)
 
@@ -115,9 +118,13 @@ export default function AdminPortal() {
   const handleApprove = async (userId: number) => {
     setActionLoading(userId)
     try {
+      const token = localStorage.getItem('session_token')
       const response = await fetch('/api/admin/approve-user', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ id: userId }),
       })
       if (!response.ok) throw new Error('Failed to approve user')
@@ -135,9 +142,13 @@ export default function AdminPortal() {
     
     setActionLoading(userId)
     try {
+      const token = localStorage.getItem('session_token')
       const response = await fetch('/api/admin/reset-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ id: userId }),
       })
       if (!response.ok) throw new Error('Failed to reset password')

@@ -7,6 +7,27 @@ import { sendEmail, getApprovalTemplate, getPasswordResetTemplate } from '../ema
 
 const router = Router()
 
+// Simple middleware to check if user is admin
+const isAdmin = async (req: any, res: any, next: any) => {
+  const token = req.headers.authorization?.split(' ')[1]
+  if (!token) return res.status(401).json({ error: 'Unauthorized' })
+
+  try {
+    const db = await getDb()
+    if (!db) return res.status(500).json({ error: 'Database not available' })
+    
+    const result = await db.select().from(users).where(eq(users.sessionToken, token)).limit(1)
+    if (result.length === 0 || !result[0].isAdmin) {
+      return res.status(403).json({ error: 'Forbidden: Admin access required' })
+    }
+    next()
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' })
+  }
+}
+
+router.use(isAdmin)
+
 /**
  * GET /api/admin/users
  * Get all users (pending and active)
@@ -45,7 +66,7 @@ router.post('/approve-user', async (req, res) => {
     await db.update(users)
       .set({ 
         emailVerified: true, 
-        password: generatedPassword,
+        passwordHash: generatedPassword,
         updatedAt: new Date()
       })
       .where(eq(users.id, id))
@@ -85,7 +106,7 @@ router.post('/reset-password', async (req, res) => {
 
     await db.update(users)
       .set({ 
-        password: newPassword,
+        passwordHash: newPassword,
         updatedAt: new Date()
       })
       .where(eq(users.id, id))
