@@ -8,6 +8,8 @@ import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AlertCircle, Loader2, CheckCircle2 } from 'lucide-react'
 import { useLocation } from 'wouter'
+import { supabase } from '@/lib/supabase'
+import { sendEmail } from '@/lib/email'
 
 export default function Auth() {
   const [, setLocation] = useLocation()
@@ -41,9 +43,33 @@ export default function Auth() {
     setLoading(true)
 
     try {
-      // For now, we'll just show a success message as we'll implement client-side email later
-      // In a real scenario, you'd call EmailJS or a similar service here
-      console.log('Signup request:', requestData)
+      // 1. Insert into Supabase users table
+      const { error: dbError } = await supabase
+        .from('users')
+        .insert([{
+          email: requestData.email,
+          first_name: requestData.firstName,
+          last_name: requestData.lastName,
+          description: requestData.description,
+          email_verified: false,
+          is_admin: false,
+          created_at: new Date().toISOString()
+        }])
+      
+      if (dbError) {
+        if (dbError.code === '23505') {
+          throw new Error('This email is already registered or has a pending request.')
+        }
+        throw dbError
+      }
+
+      // 2. Send email to admin
+      await sendEmail({
+        to_email: 'jecmcaalumni.noreply@gmail.com',
+        to_name: 'Admin',
+        subject: 'New Access Request - JEC MCA Alumni',
+        message: `A new user has requested access to the JEC MCA Alumni portal.\n\nName: ${requestData.firstName} ${requestData.lastName}\nEmail: ${requestData.email}\nDescription: ${requestData.description}\n\nPlease log in to the Admin Portal to approve this request: https://jecmcaalumni.web.app/admin`
+      })
       
       setSuccess('Your signup request has been sent to the admin. You will receive an email once approved.')
       setRequestData({ email: '', firstName: '', lastName: '', description: '' })
@@ -87,8 +113,24 @@ export default function Auth() {
     setLoading(true)
 
     try {
-      // Similar to signup, we'll implement client-side email later
-      console.log('Reset request for:', resetEmail)
+      // 1. Check if user exists
+      const { data: user, error: userError } = await supabase
+        .from('users')
+        .select('first_name, last_name')
+        .eq('email', resetEmail)
+        .single()
+      
+      if (userError || !user) {
+        throw new Error('No account found with this email address.')
+      }
+
+      // 2. Send email to admin
+      await sendEmail({
+        to_email: 'jecmcaalumni.noreply@gmail.com',
+        to_name: 'Admin',
+        subject: 'Password Reset Request - JEC MCA Alumni',
+        message: `A user has requested a password reset.\n\nName: ${user.first_name} ${user.last_name}\nEmail: ${resetEmail}\n\nPlease log in to the Admin Portal to reset their password: https://jecmcaalumni.web.app/admin`
+      })
       
       setSuccess('Your password reset request has been sent to the admin.')
       setResetEmail('')
