@@ -51,6 +51,7 @@ export default function Auth() {
           first_name: requestData.firstName,
           last_name: requestData.lastName,
           description: requestData.description,
+          password_hash: 'PENDING_APPROVAL', // Required field in schema
           email_verified: false,
           is_admin: false,
           created_at: new Date().toISOString()
