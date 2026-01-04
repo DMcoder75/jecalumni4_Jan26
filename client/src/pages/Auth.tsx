@@ -62,8 +62,17 @@ export default function Auth() {
 
     try {
       await signIn(signInData.email, signInData.password)
+      // Re-fetch user from context to get updated state
+      const savedUser = localStorage.getItem('jec_alumni_user')
+      const user = savedUser ? JSON.parse(savedUser) : null
+      
       setSignInData({ email: '', password: '' })
-      setLocation('/dashboard')
+      
+      if (user?.is_admin) {
+        setLocation('/admin')
+      } else {
+        setLocation('/dashboard')
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign in failed')
     } finally {

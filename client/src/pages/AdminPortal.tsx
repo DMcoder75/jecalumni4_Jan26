@@ -126,10 +126,17 @@ export default function AdminPortal() {
   const handleApprove = async (userId: string, userEmail: string, userName: string) => {
     setActionLoading(userId)
     try {
+      // Generate a random password
+      const generatedPassword = Math.random().toString(36).slice(-10);
+
       // Update user in Supabase
       const { error } = await supabase
         .from('users')
-        .update({ email_verified: true })
+        .update({ 
+          email_verified: true,
+          password: generatedPassword, // Saving as plain text as requested
+          password_hash: generatedPassword // Also updating hash field for compatibility
+        })
         .eq('id', userId)
       
       if (error) throw error
@@ -139,10 +146,10 @@ export default function AdminPortal() {
         to_email: userEmail,
         to_name: userName,
         subject: 'Account Approved - JEC MCA Alumni',
-        message: `Hello ${userName},\n\nYour account has been approved. You can now log in to the JEC MCA Alumni platform.`
+        message: `Hello ${userName},\n\nYour account has been approved. \n\nYour login credentials are:\nEmail: ${userEmail}\nPassword: ${generatedPassword}\n\nYou can now log in to the JEC MCA Alumni platform at https://jecmcaalumni.web.app/auth`
       })
 
-      toast.success('User approved and notification sent!')
+      toast.success('User approved and credentials emailed!')
       fetchAdminData()
     } catch (error) {
       console.error('Error approving user:', error)
@@ -157,26 +164,29 @@ export default function AdminPortal() {
     
     setActionLoading(userId)
     try {
-      // Generate a simple random password
-      const newPassword = Math.random().toString(36).slice(-8)
-      
-      // Update in Supabase (using password_hash field as plain text for now as per user request)
+      // Generate a new random password
+      const newPassword = Math.random().toString(36).slice(-10);
+
+      // Update user in Supabase
       const { error } = await supabase
         .from('users')
-        .update({ password_hash: newPassword })
+        .update({ 
+          password: newPassword,
+          password_hash: newPassword
+        })
         .eq('id', userId)
       
       if (error) throw error
 
-      // Send email
+      // Send email with new password
       await sendEmail({
         to_email: userEmail,
         to_name: userName,
         subject: 'Password Reset - JEC MCA Alumni',
-        message: `Hello ${userName},\n\nYour password has been reset. Your new password is: ${newPassword}`
+        message: `Hello ${userName},\n\nYour password has been reset by the administrator. \n\nYour new login credentials are:\nEmail: ${userEmail}\nPassword: ${newPassword}\n\nYou can log in at https://jecmcaalumni.web.app/auth`
       })
 
-      toast.success('Password reset and sent to user!')
+      toast.success('Password reset and new credentials emailed!')
     } catch (error) {
       console.error('Error resetting password:', error)
       toast.error('Error resetting password')
