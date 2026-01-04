@@ -62,20 +62,13 @@ export default function AdminPortal() {
   }, [user])
 
   const checkAdminStatus = async () => {
-    try {
-      // In this custom setup, we check the role from our database
-      const response = await fetch('/api/admin/users')
-      if (response.ok) {
-        setIsAdmin(true)
-        fetchAdminData()
-      } else {
-        setIsAdmin(false)
-      }
-    } catch (error) {
-      console.error('Error checking admin status:', error)
-    } finally {
-      setLoading(false)
+    if (user && user.isAdmin) {
+      setIsAdmin(true)
+      fetchAdminData()
+    } else {
+      setIsAdmin(false)
     }
+    setLoading(false)
   }
 
   const fetchAdminData = async () => {
