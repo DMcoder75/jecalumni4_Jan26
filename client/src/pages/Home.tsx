@@ -63,7 +63,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative py-32 md:py-48 overflow-hidden bg-white">
+      <section className="relative pt-12 pb-32 md:pt-16 md:pb-48 overflow-hidden bg-white">
         <div className="container relative z-10">
           <div className="max-w-5xl mx-auto text-center space-y-10">
             <h1 className="text-6xl md:text-8xl font-black text-[#987284] leading-tight tracking-tighter mb-4">
