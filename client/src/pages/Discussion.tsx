@@ -66,7 +66,7 @@ export default function Discussion() {
         .from('discussion_posts')
         .select(`
           *,
-          user:users(first_name, last_name, name)
+          user:users(first_name, last_name)
         `)
         .order('created_at', { ascending: false })
 
@@ -184,7 +184,7 @@ export default function Discussion() {
         .from('discussion_comments')
         .select(`
           *,
-          user:users(first_name, last_name, name)
+          user:users(first_name, last_name)
         `)
         .eq('post_id', postId)
         .order('created_at', { ascending: true })
