@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Loader2, Search, MapPin, Briefcase, Users } from 'lucide-react'
 
 export default function Directory() {
-  const { user: currentUser } = useAuth()
+  const { user: currentUser, loading: authLoading } = useAuth()
   const [, setLocation] = useLocation()
   const [alumni, setAlumni] = useState<User[]>([])
   const [connecting, setConnecting] = useState<string | null>(null)
@@ -22,9 +22,11 @@ export default function Directory() {
   const [companies, setCompanies] = useState<string[]>([])
 
   useEffect(() => {
-    fetchAlumni()
-    fetchFilters()
-  }, [currentUser])
+    if (!authLoading) {
+      fetchAlumni()
+      fetchFilters()
+    }
+  }, [currentUser, authLoading])
 
   const fetchAlumni = async () => {
     try {
