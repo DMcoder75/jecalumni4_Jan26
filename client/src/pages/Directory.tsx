@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { supabase, type User } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { useLocation } from 'wouter'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -9,7 +11,9 @@ import { Loader2, Search, MapPin, Briefcase, Users } from 'lucide-react'
 
 export default function Directory() {
   const { user: currentUser } = useAuth()
+  const [, setLocation] = useLocation()
   const [alumni, setAlumni] = useState<User[]>([])
+  const [connecting, setConnecting] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterBatch, setFilterBatch] = useState('')
@@ -110,6 +114,33 @@ export default function Directory() {
     setFilterCompany('')
     setLoading(true)
     fetchAlumni()
+  }
+
+  const handleConnect = async (targetUserId: string) => {
+    if (!currentUser) {
+      toast.error('Please sign in to connect')
+      return
+    }
+    setConnecting(targetUserId)
+    try {
+      const { error } = await supabase
+        .from('connections')
+        .insert([
+          { user_id: currentUser.id, connected_user_id: targetUserId, status: 'pending' }
+        ])
+      
+      if (error) throw error
+      toast.success('Connection request sent!')
+    } catch (error: any) {
+      if (error.code === '23505') {
+        toast.error('Connection request already sent')
+      } else {
+        console.error('Error connecting:', error)
+        toast.error('Failed to send connection request')
+      }
+    } finally {
+      setConnecting(null)
+    }
   }
 
   return (
@@ -270,11 +301,19 @@ export default function Directory() {
                 )}
 
                 <div className="flex gap-2">
-                  <Button variant="outline" className="flex-1 text-sm">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1 text-sm"
+                    onClick={() => setLocation(`/profile/${alum.id}`)}
+                  >
                     View Profile
                   </Button>
-                  <Button className="flex-1 bg-primary hover:bg-primary/90 text-sm">
-                    Connect
+                  <Button 
+                    className="flex-1 bg-primary hover:bg-primary/90 text-sm"
+                    onClick={() => handleConnect(alum.id)}
+                    disabled={connecting === alum.id}
+                  >
+                    {connecting === alum.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Connect'}
                   </Button>
                 </div>
               </Card>

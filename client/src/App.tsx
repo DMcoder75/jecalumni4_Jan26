@@ -16,6 +16,7 @@ import Messages from "./pages/Messages";
 import Mentorship from "./pages/Mentorship";
 import Feed from "./pages/Feed";
 import AdminPortal from "./pages/AdminPortal";
+import ProfileView from "./pages/ProfileView";
 import BatchReunion from "./pages/BatchReunion";
 import Navigation from "./components/Navigation";
 
@@ -29,6 +30,7 @@ function Router() {
       <Route path={"/profile-setup"} component={ProfileSetup} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/directory"} component={Directory} />
+      <Route path={"/profile/:id"} component={ProfileView} />
       <Route path={"/jobs"} component={Jobs} />
       <Route path={"/events"} component={Events} />
       <Route path={"/messages"} component={Messages} />
