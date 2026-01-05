@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -13,7 +13,17 @@ import { sendEmail, sendAdminNotification } from '@/lib/email'
 
 export default function Auth() {
   const [, setLocation] = useLocation()
-  const { signIn } = useAuth()
+  const { user, signIn } = useAuth()
+
+  useEffect(() => {
+    if (user) {
+      if (user.is_admin) {
+        setLocation('/admin')
+      } else {
+        setLocation('/dashboard')
+      }
+    }
+  }, [user, setLocation])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
