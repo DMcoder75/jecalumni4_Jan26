@@ -20,28 +20,59 @@ import AdminPortal from "./pages/AdminPortal";
 import ProfileView from "./pages/ProfileView";
 import BatchReunion from "./pages/BatchReunion";
 import Navigation from "./components/Navigation";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function Router() {
   return (
     <Switch>
+      {/* Public Routes */}
       <Route path={"/"} component={Home} />
       <Route path={"/auth"} component={Auth} />
       <Route path={"/verify-email"} component={Auth} />
       <Route path={"/reset-password"} component={Auth} />
-      <Route path={"/profile-setup"} component={ProfileSetup} />
-      <Route path={"/dashboard"} component={Dashboard} />
-      <Route path={"/directory"} component={Directory} />
-      <Route path={"/profile/:id"} component={ProfileView} />
-      <Route path={"/jobs"} component={Jobs} />
-      <Route path={"/events"} component={Events} />
-      <Route path={"/messages"} component={Messages} />
-      <Route path={"/mentorship"} component={Mentorship} />
-      <Route path={"/discussion"} component={Discussion} />
-      <Route path={"/feed"} component={Feed} />
-      <Route path={"/admin"} component={AdminPortal} />
-      <Route path={"/batch-reunion"} component={BatchReunion} />
+
+      {/* Protected Routes */}
+      <Route path="/profile-setup">
+        <ProtectedRoute component={ProfileSetup} />
+      </Route>
+      <Route path="/dashboard">
+        <ProtectedRoute component={Dashboard} />
+      </Route>
+      <Route path="/directory">
+        <ProtectedRoute component={Directory} />
+      </Route>
+      <Route path="/profile/:id">
+        <ProtectedRoute component={ProfileView} />
+      </Route>
+      <Route path="/jobs">
+        <ProtectedRoute component={Jobs} />
+      </Route>
+      <Route path="/events">
+        <ProtectedRoute component={Events} />
+      </Route>
+      <Route path="/messages">
+        <ProtectedRoute component={Messages} />
+      </Route>
+      <Route path="/mentorship">
+        <ProtectedRoute component={Mentorship} />
+      </Route>
+      <Route path="/discussion">
+        <ProtectedRoute component={Discussion} />
+      </Route>
+      <Route path="/feed">
+        <ProtectedRoute component={Feed} />
+      </Route>
+      <Route path="/batch-reunion">
+        <ProtectedRoute component={BatchReunion} />
+      </Route>
+
+      {/* Admin Only Routes */}
+      <Route path="/admin">
+        <ProtectedRoute component={AdminPortal} adminOnly />
+      </Route>
+
+      {/* Fallback Routes */}
       <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
       <Route component={NotFound} />
     </Switch>
   );
