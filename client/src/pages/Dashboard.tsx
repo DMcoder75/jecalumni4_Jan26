@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Loader2, User as UserIcon, Mail, Briefcase, MapPin, Link as LinkIcon, Edit2, Save, X, LogOut } from 'lucide-react'
 import ConnectionsManager from '@/components/ConnectionsManager'
+import MyConnections from '@/components/MyConnections'
 import { useLocation } from 'wouter'
 
 export default function Dashboard() {
@@ -57,11 +58,11 @@ export default function Dashboard() {
     if (!user) return
 
     try {
-      // Fetch connections count
+      // Fetch connections count (where user is either sender or recipient)
       const { count: connCount } = await supabase
         .from('connections')
         .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id)
+        .or(`user_id.eq.${user.id},connected_user_id.eq.${user.id}`)
         .eq('status', 'accepted')
 
       // Fetch mentorships count
@@ -163,8 +164,9 @@ export default function Dashboard() {
         </div>
 
         {/* Connections Section */}
-        <div className="mb-8">
+        <div className="space-y-8 mb-8">
           <ConnectionsManager />
+          <MyConnections />
         </div>
 
         {/* Profile Section */}
