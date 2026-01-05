@@ -49,6 +49,7 @@ export default function AdminPortal() {
     pendingContent: 0,
     reportedUsers: 0,
   })
+  const [mentorApplications, setMentorApplications] = useState<any[]>([])
 
   const [news, setNews] = useState<any[]>([])
   const [jobs, setJobs] = useState<any[]>([])
@@ -117,6 +118,15 @@ export default function AdminPortal() {
 
       setNews(pendingNews || [])
       setJobs(jobsData || [])
+
+      // Fetch mentor applications
+      const { data: mentorApps } = await supabase
+        .from('users')
+        .select('*')
+        .eq('mentor_status', 'pending')
+        .order('mentor_application_date', { ascending: false })
+      
+      setMentorApplications(mentorApps || [])
     } catch (error) {
       console.error('Error fetching admin data:', error)
       toast.error('Failed to fetch admin data')
@@ -213,6 +223,50 @@ export default function AdminPortal() {
     }
   }
 
+  const handleApproveMentor = async (userId: string) => {
+    setActionLoading(userId)
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ 
+          is_mentor: true,
+          mentor_status: 'approved'
+        })
+        .eq('id', userId)
+      
+      if (error) throw error
+      toast.success('Mentor application approved!')
+      fetchAdminData()
+    } catch (error) {
+      console.error('Error approving mentor:', error)
+      toast.error('Failed to approve mentor')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  const handleNominateMentor = async (userId: string) => {
+    setActionLoading(userId)
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ 
+          is_mentor: true,
+          mentor_status: 'approved'
+        })
+        .eq('id', userId)
+      
+      if (error) throw error
+      toast.success('User nominated as mentor!')
+      fetchAdminData()
+    } catch (error) {
+      console.error('Error nominating mentor:', error)
+      toast.error('Failed to nominate mentor')
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -300,13 +354,48 @@ export default function AdminPortal() {
 
         {/* Tabs */}
         <Tabs defaultValue="requests" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="requests">Signup Requests</TabsTrigger>
+            <TabsTrigger value="mentor-apps">Mentor Apps</TabsTrigger>
             <TabsTrigger value="active-users">Active Users</TabsTrigger>
             <TabsTrigger value="content">Content</TabsTrigger>
             <TabsTrigger value="jobs">Jobs</TabsTrigger>
             <TabsTrigger value="events">Events</TabsTrigger>
           </TabsList>
+
+          {/* Mentor Applications */}
+          <TabsContent value="mentor-apps" className="space-y-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">Pending Mentor Applications</h2>
+            {mentorApplications.length === 0 ? (
+              <Card className="p-8 text-center">
+                <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-muted-foreground">No pending mentor applications</p>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {mentorApplications.map((app) => (
+                  <Card key={app.id} className="p-6">
+                    <div className="flex flex-col md:flex-row justify-between gap-6">
+                      <div className="space-y-2 flex-1">
+                        <h3 className="text-lg font-bold">{app.first_name} {app.last_name}</h3>
+                        <p className="text-sm text-muted-foreground">{app.email}</p>
+                        <p className="text-sm">Batch: {app.batch} | Company: {app.company}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => handleApproveMentor(app.id)}
+                          disabled={actionLoading === app.id}
+                        >
+                          {actionLoading === app.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Approve Mentor'}
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
 
           {/* Signup Requests */}
           <TabsContent value="requests" className="space-y-4">
@@ -372,6 +461,17 @@ export default function AdminPortal() {
                       </div>
                     </div>
                     <div className="flex gap-2">
+                      {!u.is_mentor && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-primary border-primary hover:bg-primary/10"
+                          onClick={() => handleNominateMentor(u.id)}
+                          disabled={actionLoading === u.id}
+                        >
+                          Make Mentor
+                        </Button>
+                      )}
                       <Button 
                         variant="outline" 
                         size="sm"

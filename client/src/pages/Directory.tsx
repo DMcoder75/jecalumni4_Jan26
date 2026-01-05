@@ -13,6 +13,7 @@ export default function Directory() {
   const { user: currentUser, loading: authLoading } = useAuth()
   const [, setLocation] = useLocation()
   const [alumni, setAlumni] = useState<User[]>([])
+  const [connections, setConnections] = useState<any[]>([])
   const [connecting, setConnecting] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -25,8 +26,26 @@ export default function Directory() {
     if (!authLoading) {
       fetchAlumni()
       fetchFilters()
+      if (currentUser) {
+        fetchConnections()
+      }
     }
   }, [currentUser, authLoading])
+
+  const fetchConnections = async () => {
+    if (!currentUser) return
+    try {
+      const { data, error } = await supabase
+        .from('connections')
+        .select('*')
+        .or(`user_id.eq.${currentUser.id},connected_user_id.eq.${currentUser.id}`)
+      
+      if (error) throw error
+      setConnections(data || [])
+    } catch (error) {
+      console.error('Error fetching connections:', error)
+    }
+  }
 
   const fetchAlumni = async () => {
     try {
@@ -123,6 +142,17 @@ export default function Directory() {
       toast.error('Please sign in to connect')
       return
     }
+
+    // Check if already connected or pending
+    const existingConnection = connections.find(
+      c => (c.user_id === currentUser.id && c.connected_user_id === targetUserId) ||
+           (c.user_id === targetUserId && c.connected_user_id === currentUser.id)
+    )
+
+    if (existingConnection) {
+      return // Do nothing if already connected
+    }
+
     setConnecting(targetUserId)
     try {
       const { error } = await supabase
@@ -133,6 +163,7 @@ export default function Directory() {
       
       if (error) throw error
       toast.success('Connection request sent!')
+      fetchConnections() // Refresh connections
     } catch (error: any) {
       if (error.code === '23505') {
         toast.error('Connection request already sent')
@@ -313,9 +344,21 @@ export default function Directory() {
                   <Button 
                     className="flex-1 bg-primary hover:bg-primary/90 text-sm"
                     onClick={() => handleConnect(alum.id)}
-                    disabled={connecting === alum.id}
+                    disabled={connecting === alum.id || connections.some(c => 
+                      (c.user_id === currentUser?.id && c.connected_user_id === alum.id) ||
+                      (c.user_id === alum.id && c.connected_user_id === currentUser?.id)
+                    )}
                   >
-                    {connecting === alum.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Connect'}
+                    {connecting === alum.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : connections.some(c => 
+                      (c.user_id === currentUser?.id && c.connected_user_id === alum.id) ||
+                      (c.user_id === alum.id && c.connected_user_id === currentUser?.id)
+                    ) ? (
+                      'Connected'
+                    ) : (
+                      'Connect'
+                    )}
                   </Button>
                 </div>
               </Card>

@@ -18,6 +18,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
   updateProfile: (data: any) => Promise<void>
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -112,6 +113,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const refreshUser = async () => {
+    if (!user) return
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+      
+      if (error) throw error
+      if (data) {
+        const updatedUser = {
+          ...user,
+          ...data,
+          name: data.name || `${data.first_name || ''} ${data.last_name || ''}`.trim() || data.email.split('@')[0]
+        }
+        localStorage.setItem('jec_alumni_user', JSON.stringify(updatedUser))
+        setUser(updatedUser)
+      }
+    } catch (error) {
+      console.error('Refresh user failed:', error)
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -120,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signOut,
         updateProfile,
+        refreshUser,
       }}
     >
       {children}

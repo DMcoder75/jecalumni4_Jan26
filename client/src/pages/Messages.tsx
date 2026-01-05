@@ -44,6 +44,13 @@ export default function Messages() {
     if (selectedUserId && user) {
       fetchMessages()
       fetchUserData()
+
+      // Set up polling for new messages every 3 seconds
+      const interval = setInterval(() => {
+        fetchMessages(true) // Pass true to indicate it's a background refresh
+      }, 3000)
+
+      return () => clearInterval(interval)
     }
   }, [selectedUserId, user])
 
@@ -95,7 +102,7 @@ export default function Messages() {
     }
   }
 
-  const fetchMessages = async () => {
+  const fetchMessages = async (isBackground = false) => {
     if (!selectedUserId || !user) return
 
     try {
@@ -108,14 +115,25 @@ export default function Messages() {
         .order('created_at', { ascending: true })
 
       if (error) throw error
-      setMessages(data || [])
+      
+      // Only update state if data has changed to prevent unnecessary re-renders
+      setMessages(prev => {
+        if (JSON.stringify(prev) === JSON.stringify(data)) return prev
+        return data || []
+      })
 
-      // Mark messages as read
-      await supabase
-        .from('messages')
-        .update({ is_read: true, read_at: new Date().toISOString() })
-        .eq('recipient_id', user.id)
-        .eq('sender_id', selectedUserId)
+      // Mark messages as read only if there are new unread messages
+      const hasUnread = data?.some(msg => msg.recipient_id === user.id && !msg.is_read)
+      if (hasUnread) {
+        await supabase
+          .from('messages')
+          .update({ is_read: true, read_at: new Date().toISOString() })
+          .eq('recipient_id', user.id)
+          .eq('sender_id', selectedUserId)
+        
+        // Refresh conversations list to update unread counts
+        fetchConversations()
+      }
     } catch (error) {
       console.error('Error fetching messages:', error)
     }

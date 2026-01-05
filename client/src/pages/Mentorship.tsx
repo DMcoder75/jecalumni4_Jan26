@@ -23,6 +23,7 @@ export default function Mentorship() {
     expertise: '',
     message: '',
   })
+  const [myMentorId, setMyMentorId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchMentors()
@@ -40,7 +41,11 @@ export default function Mentorship() {
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      setMentors(data || [])
+      const processedMentors = (data || []).map(m => ({
+        ...m,
+        displayName: m.name || `${m.first_name || ''} ${m.last_name || ''}`.trim() || m.email.split('@')[0]
+      }))
+      setMentors(processedMentors)
     } catch (error) {
       console.error('Error fetching mentors:', error)
     } finally {
@@ -59,6 +64,12 @@ export default function Mentorship() {
 
       if (error) throw error
       setMyMentorships(data || [])
+
+      // Find if I have an active mentor
+      const activeMentorship = data?.find(m => m.mentee_id === user.id && (m.status === 'active' || m.status === 'pending'))
+      if (activeMentorship) {
+        setMyMentorId(activeMentorship.mentor_id)
+      }
     } catch (error) {
       console.error('Error fetching mentorships:', error)
     }
@@ -194,11 +205,11 @@ export default function Mentorship() {
                   <div className="flex items-start gap-4 mb-4">
                     <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
                       <span className="text-primary font-bold text-lg">
-                        {mentor.name.charAt(0)}
+                        {(mentor as any).displayName?.charAt(0) || '?'}
                       </span>
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-foreground">{mentor.name}</h3>
+                      <h3 className="font-bold text-foreground">{(mentor as any).displayName}</h3>
                       <p className="text-sm text-primary font-semibold">
                         {mentor.designation || 'Professional'}
                       </p>
@@ -244,13 +255,14 @@ export default function Mentorship() {
                         <Button
                           className="w-full bg-primary hover:bg-primary/90"
                           onClick={() => setSelectedMentorId(mentor.id)}
+                          disabled={myMentorId !== null}
                         >
-                          Request Mentorship
+                          {myMentorId === mentor.id ? 'My Mentor' : 'Request Mentorship'}
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Request Mentorship from {mentor.name}</DialogTitle>
+                          <DialogTitle>Request Mentorship from {(mentor as any).displayName}</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={handleRequestMentorship} className="space-y-4">
                           <div className="space-y-2">

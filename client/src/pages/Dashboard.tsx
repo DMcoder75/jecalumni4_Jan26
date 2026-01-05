@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
+import { toast } from 'sonner'
 import { Loader2, User as UserIcon, Mail, Briefcase, MapPin, Link as LinkIcon, Edit2, Save, X, LogOut } from 'lucide-react'
 import ConnectionsManager from '@/components/ConnectionsManager'
 import MyConnections from '@/components/MyConnections'
@@ -14,7 +15,7 @@ import { useLocation } from 'wouter'
 
 export default function Dashboard() {
   const [, setLocation] = useLocation()
-  const { user, signOut, updateProfile } = useAuth()
+  const { user, signOut, updateProfile, refreshUser } = useAuth()
   const [loading, setLoading] = useState(false)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -36,6 +37,7 @@ export default function Dashboard() {
     linkedin_url: user?.linkedin_url || '',
     phone: user?.phone || '',
   })
+  const [applyingMentor, setApplyingMentor] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -51,8 +53,14 @@ export default function Dashboard() {
         linkedin_url: user.linkedin_url,
         phone: user.phone,
       })
+      // Proactively refresh user data to get latest mentor status
+      refreshUserData()
     }
   }, [user])
+
+  const refreshUserData = async () => {
+    await refreshUser()
+  }
 
   const fetchStats = async () => {
     if (!user) return
@@ -128,6 +136,29 @@ export default function Dashboard() {
     )
   }
 
+  const handleBecomeMentor = async () => {
+    if (!user) return
+    setApplyingMentor(true)
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ 
+          mentor_status: 'pending',
+          mentor_application_date: new Date().toISOString()
+        })
+        .eq('id', user.id)
+      
+      if (error) throw error
+      toast.success('Mentor application submitted for admin approval!')
+      // Refresh user data would be ideal here, but for now we rely on the next refresh
+    } catch (error) {
+      console.error('Error applying for mentor:', error)
+      toast.error('Failed to submit mentor application')
+    } finally {
+      setApplyingMentor(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary py-12 px-4">
       <div className="max-w-4xl mx-auto">
@@ -135,7 +166,25 @@ export default function Dashboard() {
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-4xl font-bold text-foreground mb-2">My Dashboard</h1>
-            <p className="text-lg text-muted-foreground">Manage your profile and view your activity</p>
+            <div className="flex items-center gap-4">
+              <p className="text-lg text-muted-foreground">Manage your profile and view your activity</p>
+              {user.is_mentor ? (
+                <Badge className="bg-primary text-primary-foreground px-3 py-1 text-sm font-bold">Mentor</Badge>
+              ) : user.mentor_status === 'pending' ? (
+                <Badge variant="outline" className="text-yellow-600 border-yellow-600">Mentor request pending</Badge>
+              ) : (
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="bg-primary/10 hover:bg-primary/20 text-primary border-primary"
+                  onClick={handleBecomeMentor}
+                  disabled={applyingMentor}
+                >
+                  {applyingMentor ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                  Become a Mentor
+                </Button>
+              )}
+            </div>
           </div>
           <Button variant="outline" onClick={handleSignOut} className="text-destructive hover:bg-destructive/10">
             <LogOut className="w-4 h-4 mr-2" />

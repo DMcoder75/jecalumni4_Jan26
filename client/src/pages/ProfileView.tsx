@@ -13,14 +13,33 @@ export default function ProfileView() {
   const [, setLocation] = useLocation()
   const { user: currentUser } = useAuth()
   const [user, setUser] = useState<User | null>(null)
+  const [isConnected, setIsConnected] = useState(false)
   const [loading, setLoading] = useState(true)
   const [connecting, setConnecting] = useState(false)
 
   useEffect(() => {
     if (params?.id) {
       fetchUserProfile(params.id)
+      if (currentUser) {
+        checkConnection(params.id)
+      }
     }
-  }, [params?.id])
+  }, [params?.id, currentUser])
+
+  const checkConnection = async (targetId: string) => {
+    if (!currentUser) return
+    try {
+      const { data, error } = await supabase
+        .from('connections')
+        .select('*')
+        .or(`and(user_id.eq.${currentUser.id},connected_user_id.eq.${targetId}),and(user_id.eq.${targetId},connected_user_id.eq.${currentUser.id})`)
+      
+      if (error) throw error
+      setIsConnected(data && data.length > 0)
+    } catch (error) {
+      console.error('Error checking connection:', error)
+    }
+  }
 
   const fetchUserProfile = async (id: string) => {
     try {
@@ -42,7 +61,7 @@ export default function ProfileView() {
   }
 
   const handleConnect = async () => {
-    if (!currentUser || !user) return
+    if (!currentUser || !user || isConnected) return
     setConnecting(true)
     try {
       const { error } = await supabase
@@ -53,6 +72,7 @@ export default function ProfileView() {
       
       if (error) throw error
       toast.success('Connection request sent!')
+      setIsConnected(true)
     } catch (error: any) {
       if (error.code === '23505') {
         toast.error('Connection request already sent')
@@ -108,11 +128,17 @@ export default function ProfileView() {
                 <div className="flex gap-2 w-full md:w-auto">
                   <Button 
                     onClick={handleConnect} 
-                    disabled={connecting}
+                    disabled={connecting || isConnected}
                     className="flex-1 md:flex-none bg-primary hover:bg-primary/90"
                   >
-                    {connecting ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <UserPlus className="w-4 h-4 mr-2" />}
-                    Connect
+                    {connecting ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    ) : isConnected ? (
+                      <UserPlus className="w-4 h-4 mr-2" />
+                    ) : (
+                      <UserPlus className="w-4 h-4 mr-2" />
+                    )}
+                    {isConnected ? 'Connected' : 'Connect'}
                   </Button>
                   <Button 
                     variant="outline"
