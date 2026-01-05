@@ -5,14 +5,20 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, CheckCircle } from 'lucide-react'
+import { Loader2, CheckCircle, Lock } from 'lucide-react'
+import { toast } from 'sonner'
 import { useLocation } from 'wouter'
 
 export default function ProfileSetup() {
   const [, setLocation] = useLocation()
-  const { user, updateProfile } = useAuth()
+  const { user, updateProfile, updatePassword } = useAuth()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
+  const [passwordLoading, setPasswordLoading] = useState(false)
+  const [passwords, setPasswords] = useState({
+    newPassword: '',
+    confirmPassword: '',
+  })
   const [formData, setFormData] = useState({
     batch: '',
     company: '',
@@ -35,8 +41,33 @@ export default function ProfileSetup() {
       }, 1500)
     } catch (error) {
       console.error('Profile setup error:', error)
+      toast.error('Failed to update profile')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (passwords.newPassword !== passwords.confirmPassword) {
+      toast.error('Passwords do not match')
+      return
+    }
+    if (passwords.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters')
+      return
+    }
+
+    setPasswordLoading(true)
+    try {
+      await updatePassword(passwords.newPassword)
+      toast.success('Password updated successfully')
+      setPasswords({ newPassword: '', confirmPassword: '' })
+    } catch (error) {
+      console.error('Password update error:', error)
+      toast.error('Failed to update password')
+    } finally {
+      setPasswordLoading(false)
     }
   }
 
@@ -181,6 +212,62 @@ export default function ProfileSetup() {
               </div>
             </form>
           )}
+        </Card>
+
+        {/* Password Reset Section */}
+        <Card className="p-8 mt-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <Lock className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-foreground">Security</h2>
+              <p className="text-sm text-muted-foreground">Update your account password</p>
+            </div>
+          </div>
+
+          <form onSubmit={handlePasswordChange} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">New Password</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={passwords.newPassword}
+                  onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={passwords.confirmPassword}
+                  onChange={(e) => setPasswords({ ...passwords, confirmPassword: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+            <div className="flex justify-end">
+              <Button 
+                type="submit" 
+                disabled={passwordLoading || !passwords.newPassword}
+                className="bg-primary hover:bg-primary/90"
+              >
+                {passwordLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  'Update Password'
+                )}
+              </Button>
+            </div>
+          </form>
         </Card>
       </div>
     </div>

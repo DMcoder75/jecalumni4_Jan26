@@ -18,6 +18,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
   updateProfile: (data: any) => Promise<void>
+  updatePassword: (password: string) => Promise<void>
   refreshUser: () => Promise<void>
 }
 
@@ -113,6 +114,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const updatePassword = async (password: string) => {
+    if (!user) throw new Error('Not authenticated')
+
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ password_hash: password }) // The app uses password_hash for auth
+        .eq('id', user.id)
+
+      if (error) throw error
+    } catch (error: any) {
+      console.error('Password update failed:', error)
+      throw new Error(error.message || 'Password update failed')
+    }
+  }
+
   const refreshUser = async () => {
     if (!user) return
     try {
@@ -145,6 +162,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signOut,
         updateProfile,
+        updatePassword,
         refreshUser,
       }}
     >
