@@ -45,7 +45,7 @@ export default function ConnectionsManager() {
         .select(`
           *,
           sender:users!connections_user_id_fkey (
-            id, name, first_name, last_name, email, company, batch
+            id, first_name, last_name, email, company, batch
           )
         `)
         .eq('connected_user_id', user.id)
