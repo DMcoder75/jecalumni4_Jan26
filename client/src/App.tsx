@@ -14,6 +14,7 @@ import Jobs from "./pages/Jobs";
 import Events from "./pages/Events";
 import Messages from "./pages/Messages";
 import Mentorship from "./pages/Mentorship";
+import Discussion from "./pages/Discussion";
 import Feed from "./pages/Feed";
 import AdminPortal from "./pages/AdminPortal";
 import ProfileView from "./pages/ProfileView";
@@ -35,6 +36,7 @@ function Router() {
       <Route path={"/events"} component={Events} />
       <Route path={"/messages"} component={Messages} />
       <Route path={"/mentorship"} component={Mentorship} />
+      <Route path={"/discussion"} component={Discussion} />
       <Route path={"/feed"} component={Feed} />
       <Route path={"/admin"} component={AdminPortal} />
       <Route path={"/batch-reunion"} component={BatchReunion} />
