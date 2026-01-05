@@ -15,8 +15,16 @@ import {
   Send, 
   MoreVertical,
   User as UserIcon,
-  Clock
+  Clock,
+  Edit2,
+  Trash2
 } from 'lucide-react'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 interface Post {
   id: string
@@ -56,6 +64,10 @@ export default function Discussion() {
   const [comments, setComments] = useState<Record<string, Comment[]>>({})
   const [newCommentContent, setNewCommentContent] = useState<Record<string, string>>({})
   const [commenting, setCommenting] = useState<Record<string, boolean>>({})
+  const [editingPostId, setEditingPostId] = useState<string | null>(null)
+  const [editPostContent, setEditPostContent] = useState('')
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null)
+  const [editCommentContent, setEditCommentContent] = useState('')
 
   useEffect(() => {
     fetchPosts()
@@ -229,6 +241,75 @@ export default function Discussion() {
     }
   }
 
+  const handleDeletePost = async (postId: string) => {
+    if (!confirm('Are you sure you want to delete this post?')) return
+    try {
+      const { error } = await supabase.from('discussion_posts').delete().eq('id', postId)
+      if (error) throw error
+      toast.success('Post deleted')
+      setPosts(posts.filter(p => p.id !== postId))
+    } catch (error) {
+      console.error('Error deleting post:', error)
+      toast.error('Failed to delete post')
+    }
+  }
+
+  const handleUpdatePost = async (postId: string) => {
+    if (!editPostContent.trim()) return
+    try {
+      const { error } = await supabase
+        .from('discussion_posts')
+        .update({ content: editPostContent.trim() })
+        .eq('id', postId)
+      
+      if (error) throw error
+      toast.success('Post updated')
+      setPosts(posts.map(p => p.id === postId ? { ...p, content: editPostContent.trim() } : p))
+      setEditingPostId(null)
+    } catch (error) {
+      console.error('Error updating post:', error)
+      toast.error('Failed to update post')
+    }
+  }
+
+  const handleDeleteComment = async (postId: string, commentId: string) => {
+    if (!confirm('Are you sure you want to delete this comment?')) return
+    try {
+      const { error } = await supabase.from('discussion_comments').delete().eq('id', commentId)
+      if (error) throw error
+      toast.success('Comment deleted')
+      setComments({
+        ...comments,
+        [postId]: comments[postId].filter(c => c.id !== commentId)
+      })
+      setPosts(posts.map(p => p.id === postId ? { ...p, comments_count: p.comments_count - 1 } : p))
+    } catch (error) {
+      console.error('Error deleting comment:', error)
+      toast.error('Failed to delete comment')
+    }
+  }
+
+  const handleUpdateComment = async (postId: string, commentId: string) => {
+    if (!editCommentContent.trim()) return
+    try {
+      const { error } = await supabase
+        .from('discussion_comments')
+        .update({ content: editCommentContent.trim() })
+        .eq('id', commentId)
+      
+      if (error) throw error
+      toast.success('Comment updated')
+      setComments({
+        ...comments,
+        [postId]: comments[postId].map(c => c.id === commentId ? { ...c, content: editCommentContent.trim() } : c)
+      })
+      setEditingCommentId(null)
+    } catch (error) {
+      console.error('Error updating comment:', error)
+      toast.error('Failed to update comment')
+    }
+  }
+
   const handleShare = (post: Post) => {
     const shareUrl = window.location.href
     const shareText = `Check out this discussion on JEC Alumni: "${post.content.substring(0, 50)}..."`
@@ -329,15 +410,51 @@ export default function Discussion() {
                         </p>
                       </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-muted-foreground">
-                      <MoreVertical className="w-5 h-5" />
-                    </Button>
+                    {user && user.id === post.user_id && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="text-muted-foreground">
+                            <MoreVertical className="w-5 h-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => {
+                            setEditingPostId(post.id)
+                            setEditPostContent(post.content)
+                          }}>
+                            <Edit2 className="mr-2 h-4 w-4" />
+                            <span>Edit</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="text-destructive focus:text-destructive"
+                            onClick={() => handleDeletePost(post.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            <span>Delete</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </div>
 
                   {/* Post Content */}
-                  <div className="text-foreground mb-6 whitespace-pre-wrap leading-relaxed">
-                    {post.content}
-                  </div>
+                  {editingPostId === post.id ? (
+                    <div className="space-y-4 mb-6">
+                      <Textarea 
+                        value={editPostContent}
+                        onChange={(e) => setEditPostContent(e.target.value)}
+                        className="min-h-[100px]"
+                      />
+                      <div className="flex gap-2 justify-end">
+                        <Button variant="outline" size="sm" onClick={() => setEditingPostId(null)}>Cancel</Button>
+                        <Button size="sm" onClick={() => handleUpdatePost(post.id)}>Save Changes</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-foreground mb-6 whitespace-pre-wrap leading-relaxed">
+                      {post.content}
+                    </div>
+                  )}
 
                   {/* Post Actions */}
                   <div className="flex items-center justify-between border-t pt-4">
@@ -415,9 +532,50 @@ export default function Discussion() {
                               <span className="text-sm font-bold">
                                 {comment.user.name || `${comment.user.first_name} ${comment.user.last_name}`}
                               </span>
-                              <span className="text-[10px] text-muted-foreground">{formatTimeAgo(comment.created_at)}</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] text-muted-foreground">{formatTimeAgo(comment.created_at)}</span>
+                                {user && user.id === comment.user_id && (
+                                  <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground">
+                                        <MoreVertical className="h-3 w-3" />
+                                      </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                      <DropdownMenuItem onClick={() => {
+                                        setEditingCommentId(comment.id)
+                                        setEditCommentContent(comment.content)
+                                      }}>
+                                        <Edit2 className="mr-2 h-3 w-3" />
+                                        <span className="text-xs">Edit</span>
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem 
+                                        className="text-destructive focus:text-destructive"
+                                        onClick={() => handleDeleteComment(post.id, comment.id)}
+                                      >
+                                        <Trash2 className="mr-2 h-3 w-3" />
+                                        <span className="text-xs">Delete</span>
+                                      </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                  </DropdownMenu>
+                                )}
+                              </div>
                             </div>
-                            <p className="text-sm text-foreground">{comment.content}</p>
+                            {editingCommentId === comment.id ? (
+                              <div className="space-y-2 mt-2">
+                                <Input 
+                                  value={editCommentContent}
+                                  onChange={(e) => setEditCommentContent(e.target.value)}
+                                  className="text-sm"
+                                />
+                                <div className="flex gap-2 justify-end">
+                                  <Button variant="outline" size="xs" className="h-7 text-[10px]" onClick={() => setEditingCommentId(null)}>Cancel</Button>
+                                  <Button size="xs" className="h-7 text-[10px]" onClick={() => handleUpdateComment(post.id, comment.id)}>Save</Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-foreground">{comment.content}</p>
+                            )}
                           </div>
                         </div>
                       ))}
