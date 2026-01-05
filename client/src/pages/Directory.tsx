@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase, type User } from '@/lib/supabase'
+import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -7,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Loader2, Search, MapPin, Briefcase, Users } from 'lucide-react'
 
 export default function Directory() {
+  const { user: currentUser } = useAuth()
   const [alumni, setAlumni] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -18,11 +20,19 @@ export default function Directory() {
   useEffect(() => {
     fetchAlumni()
     fetchFilters()
-  }, [])
+  }, [currentUser])
 
   const fetchAlumni = async () => {
     try {
-      let query = supabase.from('users').select('*').order('created_at', { ascending: false })
+      let query = supabase
+        .from('users')
+        .select('*')
+        .eq('is_admin', false) // Filter out admins
+        .order('created_at', { ascending: false })
+
+      if (currentUser) {
+        query = query.neq('id', currentUser.id) // Filter out current user
+      }
 
       if (searchQuery) {
         query = query.or(
@@ -42,10 +52,15 @@ export default function Directory() {
 
       if (error) throw error
       
-      const processedData = (data || []).map(u => ({
+      let processedData = (data || []).map(u => ({
         ...u,
         name: u.name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email.split('@')[0]
       }))
+
+      // Client-side fallback filter for current user
+      if (currentUser) {
+        processedData = processedData.filter(u => u.id !== currentUser.id)
+      }
       
       setAlumni(processedData)
     } catch (error) {

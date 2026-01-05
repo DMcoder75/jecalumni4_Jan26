@@ -1,7 +1,6 @@
-import emailjs from '@emailjs/browser';
-
 /**
- * Client-side email service utility using EmailJS.
+ * Client-side email service utility using EmailJS REST API.
+ * Mapped to match the specific template placeholders.
  */
 
 export interface EmailParams {
@@ -9,38 +8,71 @@ export interface EmailParams {
   to_name: string;
   subject: string;
   message: string;
-  password?: string; // Added for password sharing
+  password?: string;
+  first_name?: string;
   [key: string]: any;
 }
 
-// EmailJS Configuration from environment variables
-const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_v1qt4hi';
-const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'v34hG0heoHqlXDIId';
-const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID || 'template_sendpwd'; 
+// EmailJS Configuration
+const SERVICE_ID = 'service_v1qt4hi';
+const PUBLIC_KEY = 'v34hG0heoHqlXDIId';
+const TEMPLATE_ID = 'template_sendpwd'; 
 const ADMIN_TEMPLATE_ID = 'template_newuser';
 
+const COMPANY_NAME = 'JEC MCA ALUMNI';
+const COMPANY_EMAIL = 'jecmcaalumni.noreply@gmail.com';
+
 export const sendEmail = async (params: EmailParams, templateId: string = TEMPLATE_ID): Promise<boolean> => {
-  console.log('Sending email via EmailJS:', params);
+  console.log('EmailJS: Preparing to send email...', { templateId, to: params.to_email });
   
+  // Mapping variables to match the template placeholders exactly
+  // The 422 error "The recipients address is empty" suggests EmailJS is not finding the email field.
+  // We'll provide it in multiple common formats to be safe.
+  const templateParams = {
+    ...params,
+    to_email: params.to_email,       // Standard placeholder
+    email: params.to_email,          // Common alternative
+    recipient_email: params.to_email, // Another common alternative
+    company_name: COMPANY_NAME,
+    company_email: COMPANY_EMAIL,
+    from_email: COMPANY_EMAIL,
+    password: params.password || '',
+    to_name: params.to_name,
+    subject: params.subject,
+    message: params.message,
+    first_name: params.first_name || params.to_name.split(' ')[0],
+    login_url: 'https://jecmcaalumni.web.app/auth'
+  };
+
+  const data = {
+    service_id: SERVICE_ID,
+    template_id: templateId,
+    user_id: PUBLIC_KEY,
+    template_params: templateParams
+  };
+
+  console.log('EmailJS: Sending payload:', JSON.stringify(data, null, 2));
+
   try {
-    const result = await emailjs.send(
-      SERVICE_ID,
-      templateId,
-      {
-        to_email: params.to_email,
-        to_name: params.to_name,
-        subject: params.subject,
-        message: params.message,
-        password: params.password || '', // Ensure password is sent if available
-        ...params
+    const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
       },
-      PUBLIC_KEY
-    );
-    
-    console.log('EmailJS Success:', result.text);
-    return true;
+      body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+      const result = await response.text();
+      console.log('EmailJS: Success!', result);
+      return true;
+    } else {
+      const errorText = await response.text();
+      console.error('EmailJS: Failed with status', response.status, errorText);
+      return false;
+    }
   } catch (error) {
-    console.error('EmailJS Error:', error);
+    console.error('EmailJS: Network or unexpected error:', error);
     return false;
   }
 };
@@ -49,7 +81,11 @@ export const sendEmail = async (params: EmailParams, templateId: string = TEMPLA
  * Specifically for sending user credentials
  */
 export const sendUserCredentials = async (email: string, name: string, password: string, isNewAccount: boolean = true) => {
-  const subject = isNewAccount ? 'Account Approved - JEC MCA Alumni' : 'Password Reset - JEC MCA Alumni';
+  const firstName = name.split(' ')[0];
+  const subject = isNewAccount 
+    ? `Welcome to JEC MCA ALUMNI - ${firstName}` 
+    : `Password Reset - JEC MCA ALUMNI - ${firstName}`;
+    
   const message = isNewAccount 
     ? `Hello ${name},\n\nYour account has been approved. Your login credentials are provided below.`
     : `Hello ${name},\n\nYour password has been reset by the administrator. Your new login credentials are provided below.`;
@@ -57,15 +93,15 @@ export const sendUserCredentials = async (email: string, name: string, password:
   return sendEmail({
     to_email: email,
     to_name: name,
+    first_name: firstName,
     subject,
     message,
-    password, // This will be mapped to {{password}} in EmailJS template
-    login_url: 'https://jecmcaalumni.web.app/auth'
-  });
+    password
+  }, TEMPLATE_ID);
 };
 
 export const sendAdminNotification = async (type: string, data: any) => {
-  const adminEmail = 'admin@jecmcaalumni.com'; // Replace with actual admin email
+  const adminEmail = COMPANY_EMAIL;
   
   let subject = '';
   let message = '';
@@ -89,6 +125,6 @@ export const sendAdminNotification = async (type: string, data: any) => {
     to_name: 'Admin',
     subject,
     message,
-    ...data // Pass all data to template
+    ...data
   }, ADMIN_TEMPLATE_ID);
 };

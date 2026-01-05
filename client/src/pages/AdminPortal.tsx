@@ -130,16 +130,20 @@ export default function AdminPortal() {
       const generatedPassword = Math.random().toString(36).slice(-10);
 
       // Update user in Supabase
+      console.log('Updating user in Supabase:', { userId, email_verified: true });
       const { error } = await supabase
         .from('users')
         .update({ 
           email_verified: true,
-          password: generatedPassword, // Saving as plain text as requested
-          password_hash: generatedPassword // Also updating hash field for compatibility
+          password_hash: generatedPassword // Update only password_hash as 'password' column doesn't exist
         })
         .eq('id', userId)
       
-      if (error) throw error
+      if (error) {
+        console.error('Supabase Update Error:', error);
+        throw error;
+      }
+      console.log('Supabase Update Success');
 
       // Send approval email via client-side service
       await sendUserCredentials(userEmail, userName, generatedPassword, true)
@@ -166,7 +170,6 @@ export default function AdminPortal() {
       const { error } = await supabase
         .from('users')
         .update({ 
-          password: newPassword,
           password_hash: newPassword
         })
         .eq('id', userId)
