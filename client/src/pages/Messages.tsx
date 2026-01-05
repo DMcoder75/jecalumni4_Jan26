@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase, type Message, type User } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
+import { useSearch } from 'wouter'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -16,8 +17,17 @@ interface Conversation {
 
 export default function Messages() {
   const { user } = useAuth()
+  const searchString = useSearch()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchString)
+    const toId = params.get('to')
+    if (toId) {
+      setSelectedUserId(toId)
+    }
+  }, [searchString])
   const [messages, setMessages] = useState<Message[]>([])
   const [selectedUserData, setSelectedUserData] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
@@ -61,13 +71,15 @@ export default function Messages() {
           // Fetch user data
           const { data: userData } = await supabase
             .from('users')
-            .select('id, name')
+            .select('id, first_name, last_name, email')
             .eq('id', otherUserId)
             .single()
 
+          const displayName = userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || userData.email.split('@')[0] : 'Unknown'
+
           convMap.set(otherUserId, {
             userId: otherUserId,
-            userName: userData?.name || 'Unknown',
+            userName: displayName,
             lastMessage: msg.content,
             lastMessageTime: msg.created_at,
             unreadCount: msg.recipient_id === user.id && !msg.is_read ? 1 : 0,
@@ -209,7 +221,7 @@ export default function Messages() {
               {/* Header */}
               <div className="border-b border-border pb-4 mb-4">
                 <h2 className="font-bold text-foreground">
-                  {selectedUserData.name}
+                  {`${selectedUserData.first_name || ''} ${selectedUserData.last_name || ''}`.trim() || selectedUserData.email.split('@')[0]}
                 </h2>
                 <p className="text-xs text-muted-foreground">
                   {selectedUserData.company || 'Alumni'}
