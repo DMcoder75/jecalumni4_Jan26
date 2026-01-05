@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { Loader2, User as UserIcon, Mail, Briefcase, MapPin, Link as LinkIcon, Edit2, Save, X, LogOut } from 'lucide-react'
+import ConnectionsManager from '@/components/ConnectionsManager'
 import { useLocation } from 'wouter'
 
 export default function Dashboard() {
@@ -159,6 +160,11 @@ export default function Dashboard() {
             <p className="text-3xl font-bold text-primary mb-2">{stats.eventsAttended}</p>
             <p className="text-sm text-muted-foreground">Events Attended</p>
           </Card>
+        </div>
+
+        {/* Connections Section */}
+        <div className="mb-8">
+          <ConnectionsManager />
         </div>
 
         {/* Profile Section */}
