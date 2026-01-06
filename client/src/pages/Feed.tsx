@@ -65,13 +65,20 @@ export default function Feed() {
     try {
       const table = postType === 'news' ? 'news' : 'success_stories'
 
-      const { error } = await supabase.from(table).insert({
+      const insertData: any = {
         title: formData.title,
         content: formData.content,
         category: formData.category,
-        author_id: user.id,
         featured: false,
-      })
+      }
+
+      if (postType === 'news') {
+        insertData.created_by = user.id
+      } else {
+        insertData.author_id = user.id
+      }
+
+      const { error } = await supabase.from(table).insert(insertData)
 
       if (error) throw error
 
