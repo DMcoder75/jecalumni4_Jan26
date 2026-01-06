@@ -9,8 +9,7 @@ import {
   Star,
   ChevronRight,
   Clock,
-  Newspaper,
-  MapPin
+  Newspaper
 } from 'lucide-react'
 import { useLocation } from 'wouter'
 
@@ -85,51 +84,60 @@ export default function DashboardSidebar() {
 
   const SidebarCard = ({ children, onClick }: { children: React.ReactNode, onClick?: () => void }) => (
     <Card 
-      className="p-4 border border-gray-200 shadow-none hover:border-[#EE7674]/50 transition-all cursor-pointer bg-white rounded-xl mb-3"
+      className="p-4 border-2 border-[#1F1F1F] shadow-none hover:bg-gray-50 transition-all cursor-pointer bg-white rounded-xl mb-4"
       onClick={onClick}
     >
       {children}
     </Card>
   )
 
-  const SectionHeader = ({ title, icon: Icon, onAction }: { title: string, icon: any, onAction: () => void }) => (
+  const SectionHeader = ({ title, icon: Icon, path }: { title: string, icon: any, path: string }) => (
     <div className="flex items-center justify-between mb-4 px-1">
       <h3 className="font-black text-[#1F1F1F] flex items-center gap-2 uppercase tracking-widest text-[10px]">
         <Icon className="w-4 h-4 text-[#EE7674]" />
         {title}
       </h3>
-      <Button variant="link" size="sm" onClick={onAction} className="text-[10px] h-auto p-0 font-black text-[#EE7674] uppercase tracking-tighter hover:no-underline">
+      <Button 
+        variant="link" 
+        size="sm" 
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setLocation(path);
+        }} 
+        className="text-[10px] h-auto p-0 font-black text-[#EE7674] uppercase tracking-tighter hover:no-underline"
+      >
         View All
       </Button>
     </div>
   )
 
   const EmptyState = () => (
-    <div className="p-6 rounded-xl border border-gray-100 bg-gray-50/50 text-center mb-3">
-      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No entries found</p>
+    <div className="p-6 rounded-xl border-2 border-[#1F1F1F] border-dashed bg-gray-50/50 text-center mb-4">
+      <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">No entries found</p>
     </div>
   )
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       {/* Upcoming Events */}
       <section>
-        <SectionHeader title="Upcoming Events" icon={Calendar} onAction={() => setLocation('/events')} />
+        <SectionHeader title="Upcoming Events" icon={Calendar} path="/events" />
         {upcomingEvents.length === 0 ? <EmptyState /> : upcomingEvents.map(event => (
           <SidebarCard key={event.id} onClick={() => setLocation('/events')}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#D0D6B5]/30 flex flex-col items-center justify-center text-[#1F1F1F] flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-[#D0D6B5] flex flex-col items-center justify-center text-[#1F1F1F] flex-shrink-0 border-2 border-[#1F1F1F]">
                 <span className="text-[9px] font-black leading-none">{new Date(event.event_date).toLocaleString('en-US', { month: 'short' }).toUpperCase()}</span>
                 <span className="text-sm font-black leading-none">{new Date(event.event_date).getDate()}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[#1F1F1F] truncate">{event.title}</p>
+                <p className="text-sm font-black text-[#1F1F1F] truncate">{event.title}</p>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <p className="text-[10px] text-gray-400 font-bold flex items-center gap-1">
-                    <Clock className="w-3 h-3" /> {new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  <p className="text-[10px] text-[#4A4A4A] font-bold flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-[#EE7674]" /> {new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                   <span className="text-gray-300">•</span>
-                  <p className="text-[10px] text-gray-400 font-bold truncate">
+                  <p className="text-[10px] text-[#4A4A4A] font-bold truncate">
                     {event.location || 'Online'}
                   </p>
                 </div>
@@ -141,19 +149,19 @@ export default function DashboardSidebar() {
 
       {/* Latest News */}
       <section>
-        <SectionHeader title="Latest News" icon={Newspaper} onAction={() => setLocation('/feed')} />
+        <SectionHeader title="Latest News" icon={Newspaper} path="/feed" />
         {latestNews.length === 0 ? <EmptyState /> : latestNews.map(item => (
           <SidebarCard key={item.id} onClick={() => setLocation('/feed')}>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-[#987284]/10 flex items-center justify-center text-[#987284] font-black text-[10px] flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-[#987284] flex items-center justify-center text-white font-black text-[10px] flex-shrink-0 border-2 border-[#1F1F1F]">
                 {item.category?.[0] || 'N'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[#1F1F1F] truncate">{item.title}</p>
-                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-tighter">{formatDate(item.created_at)}</p>
+                <p className="text-sm font-black text-[#1F1F1F] truncate">{item.title}</p>
+                <p className="text-[9px] text-[#EE7674] font-black uppercase tracking-tighter">{formatDate(item.created_at)}</p>
               </div>
             </div>
-            <p className="text-[11px] text-gray-500 font-medium truncate">
+            <p className="text-[11px] text-[#4A4A4A] font-bold truncate">
               {item.content}
             </p>
           </SidebarCard>
@@ -162,18 +170,18 @@ export default function DashboardSidebar() {
 
       {/* Top Mentors */}
       <section>
-        <SectionHeader title="Top Mentors" icon={Star} onAction={() => setLocation('/mentorship')} />
+        <SectionHeader title="Top Mentors" icon={Star} path="/mentorship" />
         {topMentors.length === 0 ? <EmptyState /> : topMentors.map(mentor => (
           <SidebarCard key={mentor.id} onClick={() => setLocation(`/profile/${mentor.id}`)}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#EE7674] flex items-center justify-center text-white font-black text-xs shadow-sm border-2 border-white flex-shrink-0">
+              <div className="w-10 h-10 rounded-full bg-[#EE7674] flex items-center justify-center text-white font-black text-xs shadow-sm border-2 border-[#1F1F1F] flex-shrink-0">
                 {mentor.first_name?.[0] || mentor.name?.[0] || '?'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[#1F1F1F] truncate">{mentor.first_name} {mentor.last_name}</p>
-                <p className="text-[10px] font-bold text-gray-400 truncate uppercase tracking-widest">{mentor.company || 'JEC Alumni'}</p>
+                <p className="text-sm font-black text-[#1F1F1F] truncate">{mentor.first_name} {mentor.last_name}</p>
+                <p className="text-[10px] font-black text-[#4A4A4A] truncate uppercase tracking-widest">{mentor.company || 'JEC Alumni'}</p>
               </div>
-              <ChevronRight className="w-4 h-4 text-gray-300" />
+              <ChevronRight className="w-4 h-4 text-[#1F1F1F]" />
             </div>
           </SidebarCard>
         ))}
@@ -181,18 +189,18 @@ export default function DashboardSidebar() {
 
       {/* Latest Jobs */}
       <section>
-        <SectionHeader title="Latest Jobs" icon={Briefcase} onAction={() => setLocation('/jobs')} />
+        <SectionHeader title="Latest Jobs" icon={Briefcase} path="/jobs" />
         {latestJobs.length === 0 ? <EmptyState /> : latestJobs.map(job => (
           <SidebarCard key={job.id} onClick={() => setLocation('/jobs')}>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#9DBF9E]/20 flex items-center justify-center text-[#9DBF9E] flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#9DBF9E] flex items-center justify-center text-white flex-shrink-0 border-2 border-[#1F1F1F]">
                 <Briefcase className="w-5 h-5" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[#1F1F1F] truncate">{job.title}</p>
-                <p className="text-[10px] font-bold text-gray-400 truncate uppercase tracking-wider mt-0.5">{job.company}</p>
+                <p className="text-sm font-black text-[#1F1F1F] truncate">{job.title}</p>
+                <p className="text-[10px] font-black text-[#4A4A4A] truncate uppercase tracking-wider mt-0.5">{job.company}</p>
               </div>
-              <ChevronRight className="w-4 h-4 text-gray-300" />
+              <ChevronRight className="w-4 h-4 text-[#1F1F1F]" />
             </div>
           </SidebarCard>
         ))}
@@ -200,19 +208,19 @@ export default function DashboardSidebar() {
 
       {/* Discussions */}
       <section>
-        <SectionHeader title="Discussions" icon={MessageSquare} onAction={() => setLocation('/discussion')} />
+        <SectionHeader title="Discussions" icon={MessageSquare} path="/discussion" />
         {latestDiscussions.length === 0 ? <EmptyState /> : latestDiscussions.map(post => (
           <SidebarCard key={post.id} onClick={() => setLocation('/discussion')}>
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-black text-[10px] flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-[#1F1F1F] flex items-center justify-center text-white font-black text-[10px] flex-shrink-0 border-2 border-[#1F1F1F]">
                 {post.user?.first_name?.[0] || 'A'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#1F1F1F] truncate">{post.user?.first_name} {post.user?.last_name}</p>
-                <p className="text-[9px] text-gray-400 font-bold">Just now</p>
+                <p className="text-xs font-black text-[#1F1F1F] truncate">{post.user?.first_name} {post.user?.last_name}</p>
+                <p className="text-[9px] text-[#EE7674] font-black">Just now</p>
               </div>
             </div>
-            <p className="text-[11px] text-gray-500 font-medium truncate italic">
+            <p className="text-[11px] text-[#4A4A4A] font-bold truncate italic">
               "{post.content}"
             </p>
           </SidebarCard>
