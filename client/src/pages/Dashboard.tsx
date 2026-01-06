@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
-import { Loader2, User as UserIcon, Mail, Briefcase, MapPin, Link as LinkIcon, Edit2, Save, X, LogOut } from 'lucide-react'
+import { Loader2, User as UserIcon, Mail, Briefcase, MapPin, Link as LinkIcon, Edit2, Save, X, LogOut, Settings } from 'lucide-react'
 import ConnectionsManager from '@/components/ConnectionsManager'
 import MyConnections from '@/components/MyConnections'
 import DashboardSidebar from '@/components/DashboardSidebar'
@@ -155,99 +155,104 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-secondary py-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+    <div className="min-h-screen bg-white py-12 px-6 md:px-12 lg:px-24">
+      <div className="max-w-[1400px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Main Content */}
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-9 space-y-10">
             {/* Header */}
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-8 border-b-2 border-[#D0D6B5]/30">
               <div>
-                <h1 className="text-4xl font-bold text-foreground mb-2">My Dashboard</h1>
-                <div className="flex items-center gap-4">
-                  <p className="text-lg text-muted-foreground">Manage your profile and view your activity</p>
+                <h1 className="text-5xl font-black text-[#1F1F1F] tracking-tighter mb-2">My Dashboard</h1>
+                <div className="flex flex-wrap items-center gap-4">
+                  <p className="text-lg text-[#4A4A4A] font-medium">Welcome back, <span className="text-[#EE7674] font-bold">{user.name}</span></p>
                   {user.is_mentor ? (
-                    <Badge className="bg-primary text-primary-foreground px-3 py-1 text-sm font-bold">Mentor</Badge>
+                    <Badge className="bg-[#987284] text-white px-3 py-1 text-xs font-black uppercase tracking-widest">Mentor</Badge>
                   ) : user.mentor_status === 'pending' ? (
-                    <Badge variant="outline" className="text-yellow-600 border-yellow-600">Mentor request pending</Badge>
+                    <Badge variant="outline" className="text-[#987284] border-[#987284] font-bold">Mentor request pending</Badge>
                   ) : (
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      className="bg-primary/10 hover:bg-primary/20 text-primary border-primary"
+                      className="bg-[#987284]/10 hover:bg-[#987284]/20 text-[#987284] border-[#987284] font-bold h-8"
                       onClick={handleBecomeMentor}
                       disabled={applyingMentor}
                     >
-                      {applyingMentor ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                      {applyingMentor ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : null}
                       Become a Mentor
                     </Button>
                   )}
                 </div>
               </div>
-              <Button variant="outline" onClick={handleSignOut} className="text-destructive hover:bg-destructive/10">
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={() => setLocation('/profile-setup')} className="border-2 border-[#1F1F1F] text-[#1F1F1F] font-black hover:bg-[#1F1F1F]/5">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Settings
+                </Button>
+                <Button variant="outline" onClick={handleSignOut} className="border-2 border-[#EE7674] text-[#EE7674] font-black hover:bg-[#EE7674]/5">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <Card className="p-6 text-center">
-                <p className="text-3xl font-bold text-primary mb-2">{stats.connections}</p>
-                <p className="text-sm text-muted-foreground">Connections</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              <Card className="p-8 text-center border-2 border-[#D0D6B5] shadow-none hover:shadow-xl transition-all">
+                <p className="text-4xl font-black text-[#EE7674] mb-1">{stats.connections}</p>
+                <p className="text-xs font-black text-[#1F1F1F] uppercase tracking-widest">Connections</p>
               </Card>
-              <Card className="p-6 text-center">
-                <p className="text-3xl font-bold text-primary mb-2">{stats.mentorships}</p>
-                <p className="text-sm text-muted-foreground">Mentorships</p>
+              <Card className="p-8 text-center border-2 border-[#D0D6B5] shadow-none hover:shadow-xl transition-all">
+                <p className="text-4xl font-black text-[#987284] mb-1">{stats.mentorships}</p>
+                <p className="text-xs font-black text-[#1F1F1F] uppercase tracking-widest">Mentorships</p>
               </Card>
-              <Card className="p-6 text-center">
-                <p className="text-3xl font-bold text-primary mb-2">{stats.jobApplications}</p>
-                <p className="text-sm text-muted-foreground">Job Apps</p>
+              <Card className="p-8 text-center border-2 border-[#D0D6B5] shadow-none hover:shadow-xl transition-all">
+                <p className="text-4xl font-black text-[#9DBF9E] mb-1">{stats.jobApplications}</p>
+                <p className="text-xs font-black text-[#1F1F1F] uppercase tracking-widest">Job Apps</p>
               </Card>
-              <Card className="p-6 text-center">
-                <p className="text-3xl font-bold text-primary mb-2">{stats.eventsAttended}</p>
-                <p className="text-sm text-muted-foreground">Events</p>
+              <Card className="p-8 text-center border-2 border-[#D0D6B5] shadow-none hover:shadow-xl transition-all">
+                <p className="text-4xl font-black text-[#1F1F1F] mb-1">{stats.eventsAttended}</p>
+                <p className="text-xs font-black text-[#1F1F1F] uppercase tracking-widest">Events</p>
               </Card>
             </div>
 
             {/* Connections Section */}
-            <div className="space-y-8 mb-8">
+            <div className="space-y-10">
               <ConnectionsManager />
               <MyConnections />
             </div>
 
             {/* Profile Section */}
-            <Card className="p-8">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-foreground">Profile Information</h2>
+            <Card className="p-10 border-2 border-[#1F1F1F] shadow-none">
+              <div className="flex justify-between items-center mb-10">
+                <h2 className="text-3xl font-black text-[#1F1F1F] tracking-tight">Profile Information</h2>
                 {!editing ? (
                   <Button
                     onClick={() => setEditing(true)}
-                    variant="outline"
-                    className="flex items-center gap-2"
+                    className="bg-[#1F1F1F] text-white font-black px-6"
                   >
-                    <Edit2 className="w-4 h-4" />
+                    <Edit2 className="w-4 h-4 mr-2" />
                     Edit Profile
                   </Button>
                 ) : (
                   <Button
                     onClick={() => setEditing(false)}
                     variant="outline"
-                    className="flex items-center gap-2"
+                    className="border-2 border-[#EE7674] text-[#EE7674] font-black"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-4 h-4 mr-2" />
                     Cancel
                   </Button>
                 )}
               </div>
 
               {editing ? (
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
-                      <Label htmlFor="name">Full Name</Label>
+                      <Label className="font-black uppercase text-[10px] tracking-widest text-muted-foreground">Full Name</Label>
                       <Input
-                        id="name"
+                        className="border-2 border-[#D0D6B5] font-bold"
                         value={formData.name || ''}
                         onChange={(e) =>
                           setFormData({ ...formData, name: e.target.value })
@@ -256,20 +261,18 @@ export default function Dashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label className="font-black uppercase text-[10px] tracking-widest text-muted-foreground">Email</Label>
                       <Input
-                        id="email"
-                        type="email"
+                        className="border-2 border-[#D0D6B5] font-bold opacity-50"
                         value={user.email}
                         disabled
-                        className="opacity-50"
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="batch">Batch Year</Label>
+                      <Label className="font-black uppercase text-[10px] tracking-widest text-muted-foreground">Batch Year</Label>
                       <Input
-                        id="batch"
+                        className="border-2 border-[#D0D6B5] font-bold"
                         value={formData.batch || ''}
                         onChange={(e) =>
                           setFormData({ ...formData, batch: e.target.value })
@@ -278,9 +281,9 @@ export default function Dashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="company">Company</Label>
+                      <Label className="font-black uppercase text-[10px] tracking-widest text-muted-foreground">Company</Label>
                       <Input
-                        id="company"
+                        className="border-2 border-[#D0D6B5] font-bold"
                         value={formData.company || ''}
                         onChange={(e) =>
                           setFormData({ ...formData, company: e.target.value })
@@ -289,9 +292,9 @@ export default function Dashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="designation">Job Title</Label>
+                      <Label className="font-black uppercase text-[10px] tracking-widest text-muted-foreground">Job Title</Label>
                       <Input
-                        id="designation"
+                        className="border-2 border-[#D0D6B5] font-bold"
                         value={formData.designation || ''}
                         onChange={(e) =>
                           setFormData({ ...formData, designation: e.target.value })
@@ -300,43 +303,21 @@ export default function Dashboard() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="location">Location</Label>
+                      <Label className="font-black uppercase text-[10px] tracking-widest text-muted-foreground">Location</Label>
                       <Input
-                        id="location"
+                        className="border-2 border-[#D0D6B5] font-bold"
                         value={formData.location || ''}
                         onChange={(e) =>
                           setFormData({ ...formData, location: e.target.value })
                         }
                       />
                     </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        value={formData.phone || ''}
-                        onChange={(e) =>
-                          setFormData({ ...formData, phone: e.target.value })
-                        }
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="linkedin">LinkedIn URL</Label>
-                      <Input
-                        id="linkedin"
-                        value={formData.linkedin_url || ''}
-                        onChange={(e) =>
-                          setFormData({ ...formData, linkedin_url: e.target.value })
-                        }
-                      />
-                    </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="skills">Skills (comma separated)</Label>
+                    <Label className="font-black uppercase text-[10px] tracking-widest text-muted-foreground">Skills (comma separated)</Label>
                     <Input
-                      id="skills"
+                      className="border-2 border-[#D0D6B5] font-bold"
                       value={formData.skills || ''}
                       onChange={(e) =>
                         setFormData({ ...formData, skills: e.target.value })
@@ -346,105 +327,112 @@ export default function Dashboard() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="bio">Bio</Label>
+                    <Label className="font-black uppercase text-[10px] tracking-widest text-muted-foreground">Bio</Label>
                     <Textarea
-                      id="bio"
+                      className="border-2 border-[#D0D6B5] font-bold min-h-[120px]"
                       value={formData.bio || ''}
                       onChange={(e) =>
                         setFormData({ ...formData, bio: e.target.value })
                       }
-                      className="min-h-[100px]"
                     />
                   </div>
 
                   <Button
                     onClick={handleSaveProfile}
-                    className="w-full"
+                    className="w-full bg-[#EE7674] hover:bg-[#EE7674]/90 text-white font-black py-6 text-lg shadow-lg"
                     disabled={saving}
                   >
                     {saving ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                         Saving Changes...
                       </>
                     ) : (
                       <>
-                        <Save className="w-4 h-4 mr-2" />
+                        <Save className="w-5 h-5 mr-2" />
                         Save Profile
                       </>
                     )}
                   </Button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 text-muted-foreground">
-                      <UserIcon className="w-5 h-5" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                  <div className="space-y-6">
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-[#EE7674]/10 rounded-xl">
+                        <UserIcon className="w-6 h-6 text-[#EE7674]" />
+                      </div>
                       <div>
-                        <p className="text-xs font-medium uppercase">Full Name</p>
-                        <p className="text-foreground font-medium">{user.name}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Full Name</p>
+                        <p className="text-xl font-bold text-[#1F1F1F]">{user.name}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 text-muted-foreground">
-                      <Mail className="w-5 h-5" />
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-[#987284]/10 rounded-xl">
+                        <Mail className="w-6 h-6 text-[#987284]" />
+                      </div>
                       <div>
-                        <p className="text-xs font-medium uppercase">Email Address</p>
-                        <p className="text-foreground font-medium">{user.email}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Email Address</p>
+                        <p className="text-xl font-bold text-[#1F1F1F]">{user.email}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 text-muted-foreground">
-                      <Briefcase className="w-5 h-5" />
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-[#9DBF9E]/10 rounded-xl">
+                        <Briefcase className="w-6 h-6 text-[#9DBF9E]" />
+                      </div>
                       <div>
-                        <p className="text-xs font-medium uppercase">Current Role</p>
-                        <p className="text-foreground font-medium">
-                          {user.designation} at {user.company}
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Current Role</p>
+                        <p className="text-xl font-bold text-[#1F1F1F]">
+                          {user.designation || 'Alumni'} at {user.company || 'JEC'}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 text-muted-foreground">
-                      <MapPin className="w-5 h-5" />
+                    <div className="flex items-start gap-4">
+                      <div className="p-3 bg-[#D0D6B5]/20 rounded-xl">
+                        <MapPin className="w-6 h-6 text-[#1F1F1F]" />
+                      </div>
                       <div>
-                        <p className="text-xs font-medium uppercase">Location</p>
-                        <p className="text-foreground font-medium">{user.location}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Location</p>
+                        <p className="text-xl font-bold text-[#1F1F1F]">{user.location || 'Not specified'}</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="space-y-4">
+                  <div className="space-y-8">
                     <div>
-                      <p className="text-xs font-medium uppercase text-muted-foreground mb-2">
-                        Skills
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">
+                        Skills & Expertise
                       </p>
                       <div className="flex flex-wrap gap-2">
-                        {user.skills?.split(',').map((skill, index) => (
-                          <Badge key={index} variant="secondary">
+                        {user.skills ? user.skills.split(',').map((skill, index) => (
+                          <Badge key={index} className="bg-[#F9B5AC]/20 text-[#EE7674] border-none font-bold px-3 py-1">
                             {skill.trim()}
                           </Badge>
-                        ))}
+                        )) : <p className="text-sm text-muted-foreground italic">No skills added yet</p>}
                       </div>
                     </div>
 
                     <div>
-                      <p className="text-xs font-medium uppercase text-muted-foreground mb-2">
-                        Bio
+                      <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3">
+                        Professional Bio
                       </p>
-                      <p className="text-sm text-foreground leading-relaxed">
-                        {user.bio || 'No bio provided yet.'}
+                      <p className="text-base text-[#4A4A4A] font-medium leading-relaxed">
+                        {user.bio || 'No bio provided yet. Tell the community about yourself!'}
                       </p>
                     </div>
 
                     {user.linkedin_url && (
-                      <div className="flex items-center gap-3 text-muted-foreground">
-                        <LinkIcon className="w-5 h-5" />
+                      <div className="pt-4">
                         <a
                           href={user.linkedin_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-primary hover:underline text-sm font-medium"
+                          className="inline-flex items-center gap-2 text-[#EE7674] font-black hover:underline"
                         >
+                          <LinkIcon className="w-5 h-5" />
                           LinkedIn Profile
                         </a>
                       </div>
@@ -455,9 +443,11 @@ export default function Dashboard() {
             </Card>
           </div>
 
-          {/* Sidebar */}
-          <div className="lg:col-span-4">
-            <DashboardSidebar />
+          {/* Sidebar - Reduced width and improved styling */}
+          <div className="lg:col-span-3">
+            <div className="sticky top-8">
+              <DashboardSidebar />
+            </div>
           </div>
         </div>
       </div>
