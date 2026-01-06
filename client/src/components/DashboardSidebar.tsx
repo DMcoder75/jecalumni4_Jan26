@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { 
   Calendar, 
   Briefcase, 
@@ -85,18 +84,22 @@ export default function DashboardSidebar() {
   const SectionWrapper = ({ title, icon: Icon, path, children, isEmpty }: { title: string, icon: any, path: string, children: React.ReactNode, isEmpty?: boolean }) => (
     <section className="mb-10">
       <div className="flex items-center justify-between mb-3 px-1">
-        <h3 className="font-black text-[#1F1F1F] flex items-center gap-2 uppercase tracking-widest text-[10px]">
+        <div className="flex items-center gap-2">
           <Icon className="w-4 h-4 text-[#EE7674]" />
-          {title}
-        </h3>
-        <Button 
-          variant="link" 
-          size="sm" 
-          onClick={() => setLocation(path)} 
-          className="text-[10px] h-auto p-0 font-black text-[#EE7674] uppercase tracking-tighter hover:no-underline"
+          <h3 className="font-black text-[#1F1F1F] uppercase tracking-widest text-[10px]">
+            {title}
+          </h3>
+        </div>
+        <button 
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setLocation(path);
+          }} 
+          className="text-[10px] font-black text-[#EE7674] uppercase tracking-tighter hover:underline cursor-pointer bg-transparent border-none p-0"
         >
           View All
-        </Button>
+        </button>
       </div>
       <Card className="border border-gray-200 shadow-sm bg-white rounded-2xl overflow-hidden">
         {isEmpty ? (
