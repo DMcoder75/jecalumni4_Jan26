@@ -82,11 +82,13 @@ export default function DashboardSidebar() {
   }
 
   const SectionWrapper = ({ title, icon: Icon, path, children, isEmpty }: { title: string, icon: any, path: string, children: React.ReactNode, isEmpty?: boolean }) => (
-    <section className="mb-10">
-      <div className="flex items-center justify-between mb-3 px-1">
-        <div className="flex items-center gap-2">
-          <Icon className="w-4 h-4 text-[#EE7674]" />
-          <h3 className="font-black text-[#1F1F1F] uppercase tracking-widest text-[10px]">
+    <section className="mb-12">
+      <div className="flex items-center justify-between mb-5 px-1">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#EE7674]/10 rounded-lg">
+            <Icon className="w-5 h-5 text-[#EE7674]" />
+          </div>
+          <h3 className="text-lg font-black text-[#1F1F1F] uppercase tracking-wider">
             {title}
           </h3>
         </div>
@@ -96,15 +98,15 @@ export default function DashboardSidebar() {
             e.stopPropagation();
             setLocation(path);
           }} 
-          className="text-[10px] font-black text-[#EE7674] uppercase tracking-tighter hover:underline cursor-pointer bg-transparent border-none p-0"
+          className="text-xs font-black text-[#EE7674] uppercase tracking-widest hover:underline cursor-pointer bg-transparent border-none p-0"
         >
           View All
         </button>
       </div>
       <Card className="border border-gray-200 shadow-sm bg-white rounded-2xl overflow-hidden">
         {isEmpty ? (
-          <div className="p-8 text-center">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">No entries found</p>
+          <div className="p-10 text-center">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">No entries found</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
@@ -116,27 +118,27 @@ export default function DashboardSidebar() {
   )
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-4">
       {/* Upcoming Events */}
       <SectionWrapper title="Upcoming Events" icon={Calendar} path="/events" isEmpty={upcomingEvents.length === 0}>
         {upcomingEvents.map(event => (
           <div 
             key={event.id} 
-            className="p-4 hover:bg-gray-50 transition-colors cursor-pointer flex items-center gap-4"
+            className="p-5 hover:bg-gray-50 transition-colors cursor-pointer flex items-center gap-4"
             onClick={() => setLocation('/events')}
           >
-            <div className="w-11 h-11 rounded-full bg-[#D0D6B5]/40 flex flex-col items-center justify-center text-[#1F1F1F] flex-shrink-0 border border-gray-200">
-              <span className="text-[9px] font-black leading-none">{new Date(event.event_date).toLocaleString('en-US', { month: 'short' }).toUpperCase()}</span>
-              <span className="text-sm font-black leading-none">{new Date(event.event_date).getDate()}</span>
+            <div className="w-12 h-12 rounded-full bg-[#D0D6B5]/40 flex flex-col items-center justify-center text-[#1F1F1F] flex-shrink-0 border border-gray-200">
+              <span className="text-[10px] font-black leading-none">{new Date(event.event_date).toLocaleString('en-US', { month: 'short' }).toUpperCase()}</span>
+              <span className="text-base font-black leading-none">{new Date(event.event_date).getDate()}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#1F1F1F] truncate">{event.title}</p>
-              <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-[10px] text-gray-500 font-medium flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-[#EE7674]" /> {new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              <p className="text-base font-bold text-[#1F1F1F] truncate">{event.title}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-xs text-gray-500 font-medium flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5 text-[#EE7674]" /> {new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
                 <span className="text-gray-300">•</span>
-                <p className="text-[10px] text-gray-500 font-medium truncate">
+                <p className="text-xs text-gray-500 font-medium truncate">
                   {event.location || 'Online'}
                 </p>
               </div>
@@ -150,19 +152,19 @@ export default function DashboardSidebar() {
         {latestNews.map(item => (
           <div 
             key={item.id} 
-            className="p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+            className="p-5 hover:bg-gray-50 transition-colors cursor-pointer"
             onClick={() => setLocation('/feed')}
           >
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-[#987284]/10 flex items-center justify-center text-[#987284] font-black text-[10px] flex-shrink-0">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-full bg-[#987284]/10 flex items-center justify-center text-[#987284] font-black text-xs flex-shrink-0">
                 {item.category?.[0] || 'N'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-[#1F1F1F] truncate">{item.title}</p>
-                <p className="text-[9px] text-[#EE7674] font-bold uppercase tracking-tighter">{formatDate(item.created_at)}</p>
+                <p className="text-base font-bold text-[#1F1F1F] truncate">{item.title}</p>
+                <p className="text-[10px] text-[#EE7674] font-bold uppercase tracking-widest">{formatDate(item.created_at)}</p>
               </div>
             </div>
-            <p className="text-[11px] text-gray-500 font-medium truncate">
+            <p className="text-sm text-gray-500 font-medium truncate">
               {item.content}
             </p>
           </div>
@@ -174,17 +176,17 @@ export default function DashboardSidebar() {
         {topMentors.map(mentor => (
           <div 
             key={mentor.id} 
-            className="p-4 hover:bg-gray-50 transition-colors cursor-pointer flex items-center gap-3"
+            className="p-5 hover:bg-gray-50 transition-colors cursor-pointer flex items-center gap-4"
             onClick={() => setLocation(`/profile/${mentor.id}`)}
           >
-            <div className="w-10 h-10 rounded-full bg-[#EE7674] flex items-center justify-center text-white font-black text-xs shadow-sm border-2 border-white flex-shrink-0">
+            <div className="w-11 h-11 rounded-full bg-[#EE7674] flex items-center justify-center text-white font-black text-sm shadow-sm border-2 border-white flex-shrink-0">
               {mentor.first_name?.[0] || mentor.name?.[0] || '?'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#1F1F1F] truncate">{mentor.first_name} {mentor.last_name}</p>
-              <p className="text-[10px] font-bold text-gray-400 truncate uppercase tracking-widest">{mentor.company || 'JEC Alumni'}</p>
+              <p className="text-base font-bold text-[#1F1F1F] truncate">{mentor.first_name} {mentor.last_name}</p>
+              <p className="text-xs font-bold text-gray-400 truncate uppercase tracking-widest">{mentor.company || 'JEC Alumni'}</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-gray-300" />
+            <ChevronRight className="w-5 h-5 text-gray-300" />
           </div>
         ))}
       </SectionWrapper>
@@ -194,17 +196,17 @@ export default function DashboardSidebar() {
         {latestJobs.map(job => (
           <div 
             key={job.id} 
-            className="p-4 hover:bg-gray-50 transition-colors cursor-pointer flex items-center gap-3"
+            className="p-5 hover:bg-gray-50 transition-colors cursor-pointer flex items-center gap-4"
             onClick={() => setLocation('/jobs')}
           >
-            <div className="w-10 h-10 rounded-xl bg-[#9DBF9E]/20 flex items-center justify-center text-[#9DBF9E] flex-shrink-0">
-              <Briefcase className="w-5 h-5" />
+            <div className="w-11 h-11 rounded-xl bg-[#9DBF9E]/20 flex items-center justify-center text-[#9DBF9E] flex-shrink-0">
+              <Briefcase className="w-6 h-6" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-[#1F1F1F] truncate">{job.title}</p>
-              <p className="text-[10px] font-bold text-gray-400 truncate uppercase tracking-wider mt-0.5">{job.company}</p>
+              <p className="text-base font-bold text-[#1F1F1F] truncate">{job.title}</p>
+              <p className="text-xs font-bold text-gray-400 truncate uppercase tracking-widest mt-1">{job.company}</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-gray-300" />
+            <ChevronRight className="w-5 h-5 text-gray-300" />
           </div>
         ))}
       </SectionWrapper>
@@ -214,19 +216,19 @@ export default function DashboardSidebar() {
         {latestDiscussions.map(post => (
           <div 
             key={post.id} 
-            className="p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+            className="p-5 hover:bg-gray-50 transition-colors cursor-pointer"
             onClick={() => setLocation('/discussion')}
           >
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-black text-[10px] flex-shrink-0">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-black text-xs flex-shrink-0">
                 {post.user?.first_name?.[0] || 'A'}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-[#1F1F1F] truncate">{post.user?.first_name} {post.user?.last_name}</p>
-                <p className="text-[9px] text-[#EE7674] font-bold">Just now</p>
+                <p className="text-sm font-bold text-[#1F1F1F] truncate">{post.user?.first_name} {post.user?.last_name}</p>
+                <p className="text-[10px] text-[#EE7674] font-bold">Just now</p>
               </div>
             </div>
-            <p className="text-[11px] text-gray-500 font-medium truncate italic">
+            <p className="text-sm text-gray-500 font-medium truncate italic">
               "{post.content}"
             </p>
           </div>
