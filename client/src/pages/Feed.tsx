@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Loader2, Newspaper, Star, Plus, Eye } from 'lucide-react'
+import { Loader2, Newspaper, Star, Plus, Eye, Calendar } from 'lucide-react'
 
 export default function Feed() {
   const { user } = useAuth()
@@ -19,6 +19,8 @@ export default function Feed() {
   const [posting, setPosting] = useState(false)
   const [showPostDialog, setShowPostDialog] = useState(false)
   const [postType, setPostType] = useState<'news' | 'story'>('news')
+  const [selectedItem, setSelectedItem] = useState<any>(null)
+  const [showDetailDialog, setShowDetailDialog] = useState(false)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -92,6 +94,18 @@ export default function Feed() {
     }
   }
 
+  const handleReadMore = async (item: any) => {
+    setSelectedItem(item)
+    setShowDetailDialog(true)
+    
+    // Increment view count in background
+    const table = news.find(n => n.id === item.id) ? 'news' : 'success_stories'
+    await supabase
+      .from(table)
+      .update({ views_count: (item.views_count || 0) + 1 })
+      .eq('id', item.id)
+  }
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -122,6 +136,9 @@ export default function Feed() {
               <DialogContent className="max-w-2xl">
                 <DialogHeader>
                   <DialogTitle>Share with the Alumni Community</DialogTitle>
+                  <DialogDescription>
+                    Post news or share your success story with fellow alumni.
+                  </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="flex gap-2 mb-4">
@@ -216,6 +233,45 @@ export default function Feed() {
           )}
         </div>
 
+        {/* Detail Dialog */}
+        <Dialog open={showDetailDialog} onOpenChange={setShowDetailDialog}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            {selectedItem && (
+              <>
+                <DialogHeader>
+                  <div className="flex items-center gap-2 mb-2">
+                    {selectedItem.category && (
+                      <Badge variant="secondary">{selectedItem.category}</Badge>
+                    )}
+                    {selectedItem.featured && (
+                      <Badge className="bg-accent text-accent-foreground">Featured</Badge>
+                    )}
+                  </div>
+                  <DialogTitle className="text-3xl font-bold">{selectedItem.title}</DialogTitle>
+                  <DialogDescription className="flex items-center gap-4 mt-2">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-4 h-4" />
+                      {formatDate(selectedItem.created_at)}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Eye className="w-4 h-4" />
+                      {selectedItem.views_count || 0} views
+                    </span>
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="mt-6 prose prose-slate max-w-none">
+                  <p className="text-lg leading-relaxed whitespace-pre-wrap text-foreground">
+                    {selectedItem.content}
+                  </p>
+                </div>
+                <div className="mt-8 pt-6 border-t flex justify-end">
+                  <Button onClick={() => setShowDetailDialog(false)}>Close</Button>
+                </div>
+              </>
+            )}
+          </DialogContent>
+        </Dialog>
+
         {/* Tabs */}
         {loading ? (
           <div className="flex justify-center items-center py-12">
@@ -278,7 +334,11 @@ export default function Feed() {
                           <Eye className="w-4 h-4" />
                           {item.views_count}
                         </span>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleReadMore(item)}
+                        >
                           Read More
                         </Button>
                       </div>
@@ -332,7 +392,11 @@ export default function Feed() {
                           <Eye className="w-4 h-4" />
                           {story.views_count}
                         </span>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleReadMore(story)}
+                        >
                           Read More
                         </Button>
                       </div>
